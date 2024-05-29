@@ -1,0 +1,2 @@
+# Osero
+Reversi (オセロ)
