@@ -46,6 +46,7 @@ if is_colab():
     OUTPUT_DIR = os.path.join(BASE_DIR, "output")
 
 else:
+    BASE_DIR = "./"
     if IS_PROTO:
         TRAIN_INPUT_DIR = "../CreateTrainData/output/proto"
     else:
@@ -60,6 +61,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 OUTPUT_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}.keras")
 OUTPUT_FIG_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}_fig.png")
+OUTPUT_LATEST_FIG_POS = os.path.join(BASE_DIR, "latest_fig_pos.txt")
 
 
 def get_checkpoint_file_name(epoch):
@@ -116,7 +118,7 @@ if __name__ == "__main__":
         model = get_model(True)
         initial_epoch = 0
         print("No checkpoint found. Starting training from scratch.")
-    print("[end construct Model]")
+    print(f"[end construct Model] model:{MODEL_NAME}")
 
     ## 学習プロセスを設定する
     print("[start compile]")
@@ -165,10 +167,10 @@ if __name__ == "__main__":
 
     end = datetime.datetime.now()
     print(f"start:{start}")
-    print(f"end:{end}")
+    print(f"end:{end} model_name:{MODEL_NAME}")
 
     plot.plot(history, OUTPUT_FIG_FILE_NAME)
 
     if is_colab():
-        with open("figure_path.txt", "w") as f:
+        with open(OUTPUT_LATEST_FIG_POS, "w") as f:
             f.write(OUTPUT_FIG_FILE_NAME)

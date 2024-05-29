@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 
-MODEL_NAME = "04_Simple"
+MODEL_NAME = "05_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -27,7 +27,7 @@ def input_shape():
         return (OSERO_HEIGHT, OSERO_HEIGHT, INPUT_CHANNEL)
 
 
-def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
+def _conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
     padding = "same" if is_padding else "valid"
     if is_start:
         return Conv2D(
@@ -48,7 +48,7 @@ def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
         )
 
 
-def dense(out_size, activation):
+def _dense(out_size, activation):
     return Dense(
         out_size,
         activation=activation,
@@ -61,15 +61,15 @@ def get_model(DEBUG=False):
     model = Sequential()
 
     # 畳み込み層
-    model.add(conv(3, 128, "relu", True, True))
+    model.add(_conv(3, 128, "relu", True, True))
 
-    model.add(conv(3, 128, "relu"))
+    model.add(_conv(3, 128, "relu"))
 
-    model.add(conv(3, 128, "relu"))
+    model.add(_conv(3, 128, "relu"))
 
-    model.add(conv(3, 128, "relu"))
+    model.add(_conv(3, 128, "relu"))
 
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+    # model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Dropout(0.25))
 
@@ -77,14 +77,14 @@ def get_model(DEBUG=False):
     model.add(Flatten())
 
     # 全結合層
-    model.add(dense(256, "relu"))
+    model.add(_dense(256, "relu"))
 
-    model.add(dense(128, "relu"))
+    model.add(_dense(128, "relu"))
 
-    model.add(dense(64, "relu"))
+    model.add(_dense(64, "relu"))
 
     # 出力層
-    model.add(dense(OUTPUT_SIZE, "softmax"))
+    model.add(_dense(OUTPUT_SIZE, "softmax"))
 
     if DEBUG:
         # レイヤー情報
