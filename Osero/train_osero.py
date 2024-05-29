@@ -1,5 +1,6 @@
 import os
 
+import keras as K
 import tensorflow as tf
 from tensorflow import keras
 from keras.models import Sequential
@@ -15,7 +16,7 @@ import load_data
 
 
 print(tf.__version__)
-print(keras.__version__)
+print(K.__version__)
 
 BATCH_SIZE = 100
 EPOCH = 1000
