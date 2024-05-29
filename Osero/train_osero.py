@@ -113,7 +113,7 @@ if __name__ == "__main__":
         )
     else:
         # 最初から
-        model = get_model()
+        model = get_model(True)
         initial_epoch = 0
         print("No checkpoint found. Starting training from scratch.")
     print("[end construct Model]")
@@ -170,6 +170,8 @@ if __name__ == "__main__":
     plot.plot(history, OUTPUT_FIG_FILE_NAME)
 
     if is_colab():
-        from IPython.display import Image, display_png
+        from PIL import Image
+        from IPython.display import display
 
-        display_png(OUTPUT_FIG_FILE_NAME)
+        img = Image.open(OUTPUT_FIG_FILE_NAME)
+        display(img)
