@@ -172,4 +172,4 @@ if __name__ == "__main__":
     if is_colab():
         from IPython.display import Image, display_png
 
-        display_jpeg(OUTPUT_FIG_FILE_NAME)
+        display_png(OUTPUT_FIG_FILE_NAME)
