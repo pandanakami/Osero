@@ -61,7 +61,7 @@ def get_model(DEBUG=False):
     # モデルの定義
     model = Sequential()
 
-    leaky_relu = K.layers.LeakyReLU().name
+    leaky_relu = "leaky_relu"
 
     # 畳み込み層
     model.add(_conv(3, 128, leaky_relu, True, True))
