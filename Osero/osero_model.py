@@ -4,6 +4,8 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 
+MODEL_NAME = "00_Simple"
+
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
 OSERO_WIDTH = 8

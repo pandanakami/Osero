@@ -13,8 +13,10 @@ def load_data(TRAIN_INPUT_DIR: str):
     x_train = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_train_x.npy"))
     x_eval = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_eval_x.npy"))
     # (N,1)
-    t_train = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_train_t.npy"))
-    t_eval = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_eval_t.npy"))
+    t_train = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_train_t.npy")).astype(
+        np.int32
+    )
+    t_eval = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_eval_t.npy")).astype(np.int32)
 
     if is_channel_first():
         # チャンネルが前
@@ -41,9 +43,6 @@ def load_data(TRAIN_INPUT_DIR: str):
         # (N,8,8) => (N,8,8,3)
         x_train = one_hot_encode(x_train)
         x_eval = one_hot_encode(x_eval)
-
-    t_train = keras.utils.to_categorical(t_train, OUTPUT_SIZE, dtype=np.float16)
-    t_eval = keras.utils.to_categorical(t_eval, OUTPUT_SIZE, dtype=np.float16)
 
     # 訓練データを検証データに分ける
     x_train, x_val, t_train, t_val = train_test_split(x_train, t_train, test_size=0.2)

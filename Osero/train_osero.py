@@ -10,7 +10,7 @@ from sklearn.model_selection import train_test_split
 import re
 import datetime
 
-from osero_model import INPUT_CHANNEL, OUTPUT_SIZE
+from osero_model import INPUT_CHANNEL, OUTPUT_SIZE, MODEL_NAME
 from osero_model import is_channel_first, get_model
 import load_data
 
@@ -21,29 +21,54 @@ print(K.__version__)
 BATCH_SIZE = 100
 EPOCH = 1000
 
+IS_PROTO = os.getenv("PROTOTYPING_DEVELOP") == "True"
+if IS_PROTO:
+    print("[PROTOTYPING MODE]")
+
 
 def is_colab():
     return "COLAB_GPU" in os.environ
 
 
+SAVE_NAME = f"{MODEL_NAME}{'_proto' if IS_PROTO else '_'}"
+
 if is_colab():
     # Google Driveの保存ディレクトリを指定
-    CHECK_POINT_DIR = "/content/drive/MyDrive/osero/checkpoints"
-    TRAIN_INPUT_DIR = "/content/drive/MyDrive/osero/input"
+    BASE_DIR = "/content/drive/MyDrive/osero/"
+
+    if IS_PROTO:
+        TRAIN_INPUT_DIR = os.path.join(BASE_DIR, "input_proto")
+    else:
+        TRAIN_INPUT_DIR = os.path.join(BASE_DIR, "input")
+
+    CHECK_POINT_DIR = os.path.join(BASE_DIR, f"checkpoints_{SAVE_NAME}")
+    OUTPUT_DIR = os.path.join(BASE_DIR, "output")
+
 else:
-    CHECK_POINT_DIR = "./checkpoints"
-    TRAIN_INPUT_DIR = "../CreateTrainData/output"
+    if IS_PROTO:
+        TRAIN_INPUT_DIR = "../CreateTrainData/output/proto"
+    else:
+        TRAIN_INPUT_DIR = "../CreateTrainData/output"
+
+    CHECK_POINT_DIR = f"./checkpoints_{SAVE_NAME}"
+    OUTPUT_DIR = "./output"
 
 os.makedirs(CHECK_POINT_DIR, exist_ok=True)
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+
+OUTPUT_FILE_NAME = os.path.join(
+    OUTPUT_DIR, f"{MODEL_NAME}{'_proto' if IS_PROTO else '_'}.keras"
+)
 
 
 def get_checkpoint_file_name(epoch):
-    return f"epoch_{epoch:02d}_checkpoint.h5"
+    return f"epoch_{epoch:02d}_checkpoint.keras"
 
 
 # 保存されたチェックポイントファイルから最大のエポック番号を取得
 def get_latest_checkpoint_epoch(checkpoint_dir):
-    pattern = re.compile(r"epoch_(\d+)_checkpoint\.h5")
+    pattern = re.compile(r"epoch_(\d+)_checkpoint\.keras")
     max_epoch = -1
     for filename in os.listdir(checkpoint_dir):
         match = pattern.match(filename)
@@ -82,7 +107,7 @@ if __name__ == "__main__":
         model = keras.models.load_model(
             os.path.join(CHECK_POINT_DIR, get_checkpoint_file_name(latest_epoch))
         )
-        initial_epoch = latest_epoch + 1
+        initial_epoch = latest_epoch
         print(
             f"Loaded model from epoch {latest_epoch}. Resuming training from epoch {initial_epoch}."
         )
@@ -96,7 +121,7 @@ if __name__ == "__main__":
     ## 学習プロセスを設定する
     print("[start compile]")
     model.compile(
-        loss=keras.losses.categorical_crossentropy,
+        loss=K.losses.SparseCategoricalCrossentropy(),
         optimizer=tf.keras.optimizers.Adam(),
         # 評価関数を指定
         metrics=[keras.metrics.Accuracy().name],
@@ -109,7 +134,7 @@ if __name__ == "__main__":
 
     # ModelCheckpointコールバックの設定
     checkpoint_callback = keras.callbacks.ModelCheckpoint(
-        filepath=os.path.join(CHECK_POINT_DIR, "epoch_{epoch:02d}_checkpoint.h5"),
+        filepath=os.path.join(CHECK_POINT_DIR, "epoch_{epoch:02d}_checkpoint.keras"),
         save_weights_only=False,
         save_freq="epoch",  # エポックごとに保存
     )
@@ -134,6 +159,9 @@ if __name__ == "__main__":
     print("[start evaluate]")
     score = model.evaluate(x_eval, t_eval, verbose=0)
     print(f"[end evaluate] loss:{score[0]:3f}, acc:{score[1]:3f}")
+
+    ##保存
+    model.save(OUTPUT_FILE_NAME)
 
     end = datetime.datetime.now()
     print(f"start:{start}")
