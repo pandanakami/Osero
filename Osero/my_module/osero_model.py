@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 
-MODEL_NAME = "03_Simple"
+MODEL_NAME = "04_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -27,30 +27,48 @@ def input_shape():
         return (OSERO_HEIGHT, OSERO_HEIGHT, INPUT_CHANNEL)
 
 
+def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
+    padding = "same" if is_padding else "valid"
+    if is_start:
+        return Conv2D(
+            out_size,
+            kernel_size=(kernel_size, kernel_size),
+            activation=activation,
+            input_shape=input_shape(),
+            padding=padding,
+            kernel_initializer=keras.initializers.he_normal,
+        )
+    else:
+        return Conv2D(
+            out_size,
+            kernel_size=(kernel_size, kernel_size),
+            activation=activation,
+            padding=padding,
+            kernel_initializer=keras.initializers.he_normal,
+        )
+
+
+def dense(out_size, activation):
+    return Dense(
+        out_size,
+        activation=activation,
+        kernel_initializer=keras.initializers.he_normal,
+    )
+
+
 def get_model(DEBUG=False):
     # モデルの定義
     model = Sequential()
 
     # 畳み込み層
-    model.add(
-        Conv2D(
-            128,
-            kernel_size=(3, 3),
-            activation="relu",
-            input_shape=input_shape(),
-            padding="same",
-            kernel_initializer=keras.initializers.he_normal,
-        )
-    )
-    model.add(
-        Conv2D(
-            128,
-            kernel_size=(3, 3),
-            activation="relu",
-            padding="same",
-            kernel_initializer=keras.initializers.he_normal,
-        )
-    )
+    model.add(conv(3, 128, "relu", True, True))
+
+    model.add(conv(3, 128, "relu"))
+
+    model.add(conv(3, 128, "relu"))
+
+    model.add(conv(3, 128, "relu"))
+
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Dropout(0.25))
@@ -59,36 +77,14 @@ def get_model(DEBUG=False):
     model.add(Flatten())
 
     # 全結合層
-    model.add(
-        Dense(
-            256,
-            activation="relu",
-            kernel_initializer=keras.initializers.he_normal,
-        )
-    )
+    model.add(dense(256, "relu"))
 
-    model.add(
-        Dense(
-            128,
-            activation="relu",
-            kernel_initializer=keras.initializers.he_normal,
-        )
-    )
-    model.add(
-        Dense(
-            64,
-            activation="relu",
-            kernel_initializer=keras.initializers.he_normal,
-        )
-    )
+    model.add(dense(128, "relu"))
+
+    model.add(dense(64, "relu"))
+
     # 出力層
-    model.add(
-        Dense(
-            OUTPUT_SIZE,
-            activation="softmax",
-            kernel_initializer=keras.initializers.he_normal,
-        )
-    )  # 盤面の各セルに対する確率
+    model.add(dense(OUTPUT_SIZE, "softmax"))
 
     if DEBUG:
         # レイヤー情報
