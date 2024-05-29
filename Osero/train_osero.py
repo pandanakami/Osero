@@ -27,10 +27,6 @@ def is_colab():
 
 
 if is_colab():
-    from google.colab import drive
-
-    # Google Driveをマウント
-    drive.mount("/content/drive")
     # Google Driveの保存ディレクトリを指定
     CHECK_POINT_DIR = "/content/drive/MyDrive/osero/checkpoints"
     TRAIN_INPUT_DIR = "content/drive/MyDrive/osero/input"
