@@ -29,10 +29,10 @@ def is_colab():
 if is_colab():
     # Google Driveの保存ディレクトリを指定
     CHECK_POINT_DIR = "/content/drive/MyDrive/osero/checkpoints"
-    TRAIN_INPUT_DIR = "content/drive/MyDrive/osero/input/"
+    TRAIN_INPUT_DIR = "/content/drive/MyDrive/osero/input"
 else:
     CHECK_POINT_DIR = "./checkpoints"
-    TRAIN_INPUT_DIR = "../CreateTrainData/output/"
+    TRAIN_INPUT_DIR = "../CreateTrainData/output"
 
 os.makedirs(CHECK_POINT_DIR, exist_ok=True)
 

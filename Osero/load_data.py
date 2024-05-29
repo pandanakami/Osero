@@ -1,3 +1,4 @@
+import os
 import numpy as np
 from osero_model import INPUT_CHANNEL, OUTPUT_SIZE
 from osero_model import is_channel_first
@@ -9,11 +10,11 @@ def load_data(TRAIN_INPUT_DIR: str):
 
     ## データ取得
     # (N,8,8)
-    x_train = np.load(TRAIN_INPUT_DIR + "osero_train_x.npy")
-    x_eval = np.load(TRAIN_INPUT_DIR + "osero_eval_x.npy")
+    x_train = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_train_x.npy"))
+    x_eval = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_eval_x.npy"))
     # (N,1)
-    t_train = np.load(TRAIN_INPUT_DIR + "osero_train_t.npy")
-    t_eval = np.load(TRAIN_INPUT_DIR + "osero_eval_t.npy")
+    t_train = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_train_t.npy"))
+    t_eval = np.load(os.path.join(TRAIN_INPUT_DIR, "osero_eval_t.npy"))
 
     if is_channel_first():
         # チャンネルが前
