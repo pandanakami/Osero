@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 
-MODEL_NAME = "05_Simple"
+MODEL_NAME = "06_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -69,7 +69,7 @@ def get_model(DEBUG=False):
 
     model.add(_conv(3, 128, "relu"))
 
-    # model.add(MaxPooling2D(pool_size=(2, 2)))
+    model.add(MaxPooling2D(pool_size=(2, 2)))
 
     model.add(Dropout(0.25))
 
@@ -77,6 +77,7 @@ def get_model(DEBUG=False):
     model.add(Flatten())
 
     # 全結合層
+    model.add(_dense(512, "relu"))
     model.add(_dense(256, "relu"))
 
     model.add(_dense(128, "relu"))
