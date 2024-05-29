@@ -168,3 +168,8 @@ if __name__ == "__main__":
     print(f"end:{end}")
 
     plot.plot(history, OUTPUT_FIG_FILE_NAME)
+
+    if is_colab():
+        from IPython.display import Image, display_png
+
+        display_jpeg(OUTPUT_FIG_FILE_NAME)
