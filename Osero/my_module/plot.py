@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot(history):
+def plot(history, savepos):
     loss = history.history["loss"]
     val_loss = history.history["val_loss"]
 
@@ -20,4 +20,5 @@ def plot(history):
     # 凡例
     plt.legend()
     # 描画
-    plt.show()
+    # plt.show()
+    plt.savefig(savepos)

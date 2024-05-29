@@ -58,9 +58,8 @@ os.makedirs(CHECK_POINT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
-OUTPUT_FILE_NAME = os.path.join(
-    OUTPUT_DIR, f"{MODEL_NAME}{'_proto' if IS_PROTO else '_'}.keras"
-)
+OUTPUT_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}.keras")
+OUTPUT_FIG_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}_fig.png")
 
 
 def get_checkpoint_file_name(epoch):
@@ -168,4 +167,4 @@ if __name__ == "__main__":
     print(f"start:{start}")
     print(f"end:{end}")
 
-    plot.plot(history)
+    plot.plot(history, OUTPUT_FIG_FILE_NAME)
