@@ -170,8 +170,5 @@ if __name__ == "__main__":
     plot.plot(history, OUTPUT_FIG_FILE_NAME)
 
     if is_colab():
-        from PIL import Image
-        from IPython.display import display
-
-        img = Image.open(OUTPUT_FIG_FILE_NAME)
-        display(img)
+        with open("figure_path.txt", "w") as f:
+            f.write(OUTPUT_FIG_FILE_NAME)
