@@ -1,10 +1,11 @@
 import tensorflow as tf
 from tensorflow import keras
+import keras as K
 from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 
-MODEL_NAME = "06_Simple"
+MODEL_NAME = "07_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -60,14 +61,16 @@ def get_model(DEBUG=False):
     # モデルの定義
     model = Sequential()
 
+    leaky_relu = K.layers.LeakyReLU().name
+
     # 畳み込み層
-    model.add(_conv(3, 128, "relu", True, True))
+    model.add(_conv(3, 128, leaky_relu, True, True))
 
-    model.add(_conv(3, 128, "relu"))
+    model.add(_conv(3, 128, leaky_relu))
 
-    model.add(_conv(3, 128, "relu"))
+    model.add(_conv(3, 128, leaky_relu))
 
-    model.add(_conv(3, 128, "relu"))
+    model.add(_conv(3, 128, leaky_relu))
 
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
@@ -77,7 +80,6 @@ def get_model(DEBUG=False):
     model.add(Flatten())
 
     # 全結合層
-    model.add(_dense(512, "relu"))
     model.add(_dense(256, "relu"))
 
     model.add(_dense(128, "relu"))
