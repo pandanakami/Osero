@@ -5,7 +5,7 @@ from keras.models import Sequential
 from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
 import numpy as np
 
-MODEL_NAME = "08_Simple"
+MODEL_NAME = "03_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -64,17 +64,9 @@ def get_model(DEBUG=False):
     conv_activation = "relu"
 
     # 畳み込み層
-    model.add(_conv(3, 128, conv_activation, True, True))
+    model.add(_conv(3, 32, conv_activation, True, True))
 
-    model.add(_conv(3, 128, conv_activation))
-
-    model.add(_conv(3, 128, conv_activation))
-
-    model.add(_conv(3, 128, conv_activation))
-
-    model.add(_conv(3, 128, conv_activation))
-
-    model.add(_conv(3, 128, conv_activation))
+    model.add(_conv(3, 64, conv_activation))
 
     model.add(MaxPooling2D(pool_size=(2, 2)))
 
