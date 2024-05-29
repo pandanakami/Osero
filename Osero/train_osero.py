@@ -10,9 +10,10 @@ from sklearn.model_selection import train_test_split
 import re
 import datetime
 
-from osero_model import INPUT_CHANNEL, OUTPUT_SIZE, MODEL_NAME
-from osero_model import is_channel_first, get_model
-import load_data
+from my_module.osero_model import INPUT_CHANNEL, OUTPUT_SIZE, MODEL_NAME
+from my_module.osero_model import is_channel_first, get_model
+import my_module.load_data as load_data
+from my_module import plot
 
 
 print(tf.__version__)
@@ -139,7 +140,7 @@ if __name__ == "__main__":
         save_freq="epoch",  # エポックごとに保存
     )
 
-    model.fit(
+    history = model.fit(
         x_train,
         t_train,
         batch_size=BATCH_SIZE,
@@ -166,3 +167,5 @@ if __name__ == "__main__":
     end = datetime.datetime.now()
     print(f"start:{start}")
     print(f"end:{end}")
+
+    plot.plot(history)
