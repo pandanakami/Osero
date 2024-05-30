@@ -12,7 +12,7 @@ from keras.layers import (
 )
 import numpy as np
 
-MODEL_NAME = "11_Simple"
+MODEL_NAME = "12_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -72,20 +72,32 @@ def get_model(DEBUG=False):
 
     # 畳み込み層
     model.add(_conv(3, 128, conv_activation, True, True))
+
+    model.add(Dropout(0.25))
+
     model.add(_conv(3, 128, conv_activation))
 
     # model.add(BatchNormalization())
-    # model.add(Dropout(0.25))
+    model.add(Dropout(0.25))
 
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
+    model.add(Dropout(0.25))
     model.add(_conv(3, 128, conv_activation))
 
     # model.add(BatchNormalization())
