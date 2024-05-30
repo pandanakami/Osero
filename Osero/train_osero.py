@@ -32,7 +32,12 @@ parser.add_argument("-f", "--forceproto", action="store_true", help="Force proto
 parser.add_argument(
     "-d", "--detail_discord_ntfy", action="store_true", help="Detail discord ntfy"
 )
-
+parser.add_argument(
+    "-n",
+    "--not_upload_to_gdrive",
+    action="store_true",
+    help="Not upload result to gdrive",
+)
 # 引数を解析
 args = parser.parse_args()
 
@@ -239,18 +244,19 @@ if __name__ == "__main__":
     plot.plot(train_history, OUTPUT_FIG_FILE_NAME, is_colab())
 
     if not is_colab():
-        # モデルアップロード
-        gdrive_mng.upload(
-            local_file_path=OUTPUT_FILE_NAME,
-            save_folder_id="1r3nNbTkJk77eMMSVq-zXRz_gBaVbtd1x",
-            is_convert=True,
-        )
-        # 図アップロード
-        gdrive_mng.upload(
-            local_file_path=OUTPUT_FIG_FILE_NAME,
-            save_folder_id="1r3nNbTkJk77eMMSVq-zXRz_gBaVbtd1x",
-            is_convert=True,
-        )
+        if not args.not_upload_to_gdrive:
+            # モデルアップロード
+            gdrive_mng.upload(
+                local_file_path=OUTPUT_FILE_NAME,
+                save_folder_id="1r3nNbTkJk77eMMSVq-zXRz_gBaVbtd1x",
+                is_convert=True,
+            )
+            # 図アップロード
+            gdrive_mng.upload(
+                local_file_path=OUTPUT_FIG_FILE_NAME,
+                save_folder_id="1r3nNbTkJk77eMMSVq-zXRz_gBaVbtd1x",
+                is_convert=True,
+            )
 
     if is_colab():
         with open(OUTPUT_LATEST_FIG_POS, "w") as f:
