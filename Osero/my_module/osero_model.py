@@ -12,7 +12,7 @@ from keras.layers import (
 )
 import numpy as np
 
-MODEL_NAME = "09_Simple"
+MODEL_NAME = "10_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -74,13 +74,13 @@ def get_model(DEBUG=False):
     model.add(_conv(3, 128, conv_activation, True, True))
     model.add(_conv(3, 128, conv_activation))
 
-    # model.add(BatchNormalization())
-    # model.add(Dropout(0.25))
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
 
-    # model.add(_conv(3, 128, conv_activation))
-    # model.add(_conv(3, 128, conv_activation))
+    model.add(_conv(3, 128, conv_activation))
+    model.add(_conv(3, 128, conv_activation))
 
-    # model.add(BatchNormalization())
+    model.add(BatchNormalization())
     model.add(Dropout(0.25))
 
     model.add(MaxPooling2D(pool_size=(2, 2)))
@@ -95,7 +95,7 @@ def get_model(DEBUG=False):
 
     model.add(_dense(64, "relu"))
 
-    # model.add(Dropout(0.5))
+    model.add(Dropout(0.5))
 
     # 出力層
     model.add(_dense(OUTPUT_SIZE, "softmax"))
