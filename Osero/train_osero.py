@@ -236,7 +236,7 @@ if __name__ == "__main__":
     ##web hook
     discord_write(f"{MODEL_NAME}: train finish. loss:{score[0]:3f}, acc:{score[1]:3f}")
 
-    plot.plot(train_history, OUTPUT_FIG_FILE_NAME)
+    plot.plot(train_history, OUTPUT_FIG_FILE_NAME, is_colab())
 
     if not is_colab():
         # モデルアップロード
