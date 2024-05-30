@@ -2,10 +2,17 @@ import tensorflow as tf
 from tensorflow import keras
 import keras as K
 from keras.models import Sequential
-from keras.layers import Conv2D, MaxPooling2D, Flatten, Dense, Dropout
+from keras.layers import (
+    Conv2D,
+    MaxPooling2D,
+    Flatten,
+    Dense,
+    Dropout,
+    BatchNormalization,
+)
 import numpy as np
 
-MODEL_NAME = "08_Simple"
+MODEL_NAME = "09_Simple"
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -65,16 +72,18 @@ def get_model(DEBUG=False):
 
     # 畳み込み層
     model.add(_conv(3, 128, conv_activation, True, True))
+    model.add(_conv(3, 128, conv_activation))
+
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
 
     model.add(_conv(3, 128, conv_activation))
     model.add(_conv(3, 128, conv_activation))
-    model.add(_conv(3, 128, conv_activation))
-    model.add(_conv(3, 128, conv_activation))
-    model.add(_conv(3, 128, conv_activation))
+
+    model.add(BatchNormalization())
+    model.add(Dropout(0.25))
 
     model.add(MaxPooling2D(pool_size=(2, 2)))
-
-    model.add(Dropout(0.25))
 
     # フラット化
     model.add(Flatten())
@@ -85,6 +94,8 @@ def get_model(DEBUG=False):
     model.add(_dense(128, "relu"))
 
     model.add(_dense(64, "relu"))
+
+    model.add(Dropout(0.5))
 
     # 出力層
     model.add(_dense(OUTPUT_SIZE, "softmax"))
