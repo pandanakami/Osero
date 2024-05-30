@@ -1,4 +1,6 @@
+#/bin/sh
+
 source ~/.venv/bin/activate
 
-PROTOTYPING_DEVELOP="True"
-python train_osero.py
+export PROTOTYPING_DEVELOP="True"
+python train_osero.py -d -f

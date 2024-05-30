@@ -17,6 +17,7 @@ from my_module import plot
 from my_module.gdrive_uploader import GoogleDriveFacade
 import json
 import requests
+import argparse
 
 print(tf.__version__)
 print(K.__version__)
@@ -24,7 +25,25 @@ print(K.__version__)
 BATCH_SIZE = 100
 EPOCH = 1000
 
+
+parser = argparse.ArgumentParser(description="Example script with arguments")
+# 引数を追加
+parser.add_argument("-f", "--forceproto", action="store_true", help="Force prototype")
+parser.add_argument(
+    "-d", "--detail_discord_ntfy", action="store_true", help="Detail discord ntfy"
+)
+
+# 引数を解析
+args = parser.parse_args()
+
+print(f"--forceproto:{args.forceproto}")
+print(f"--detail_discord_ntfy:{args.detail_discord_ntfy}")
+
+
 IS_PROTO = os.getenv("PROTOTYPING_DEVELOP") == "True"
+
+if args.forceproto:
+    IS_PROTO = True
 
 if IS_PROTO:
     print("[PROTOTYPING MODE]")
@@ -84,11 +103,22 @@ def get_latest_checkpoint_epoch(train_history):
 train_history = []
 
 
+def discord_write(message):
+    url = "https://discord.com/api/webhooks/1094787057072734329/SWHyvUiWsMf6uDEH2TlVg-wT6nPdGoWJi9ljFsmABs6TgyzUOyzmiwsCeuRBFUvghCPX"
+    content = {"content": message}
+    headers = {"Content-Type": "application/json"}
+    requests.post(url, json.dumps(content), headers=headers)
+
+
 # カスタムコールバックの定義
 class HistorySaver(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
         save_epoch = epoch + 1
         print(f"Epoch {save_epoch} finished. Saving parameters.")
+
+        if args.detail_discord_ntfy:
+            discord_write(f"update epoch:{save_epoch} ({MODEL_NAME})")
+
         result = next(
             (item for item in train_history if item["epoch"] == save_epoch), None
         )
@@ -204,12 +234,7 @@ if __name__ == "__main__":
     print(f"end:{end} model_name:{MODEL_NAME}")
 
     ##web hook
-    url = "https://discord.com/api/webhooks/1094787057072734329/SWHyvUiWsMf6uDEH2TlVg-wT6nPdGoWJi9ljFsmABs6TgyzUOyzmiwsCeuRBFUvghCPX"
-    content = {
-        "content": f"{MODEL_NAME}: train finish. loss:{score[0]:3f}, acc:{score[1]:3f}"
-    }
-    headers = {"Content-Type": "application/json"}
-    requests.post(url, json.dumps(content), headers=headers)
+    discord_write(f"{MODEL_NAME}: train finish. loss:{score[0]:3f}, acc:{score[1]:3f}")
 
     plot.plot(train_history, OUTPUT_FIG_FILE_NAME)
 
