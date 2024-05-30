@@ -1,4 +1,6 @@
 /checkpoints*
 /output/
 **/__pycache__/
-*.xlsx
+/client_secrets.json
+/mycreds.txt
+/test*

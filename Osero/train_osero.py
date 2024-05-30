@@ -14,7 +14,9 @@ from my_module.osero_model import INPUT_CHANNEL, OUTPUT_SIZE, MODEL_NAME
 from my_module.osero_model import is_channel_first, get_model
 import my_module.load_data as load_data
 from my_module import plot
+from my_module.gdrive_uploader import GoogleDriveFacade
 import json
+import requests
 
 print(tf.__version__)
 print(K.__version__)
@@ -23,6 +25,7 @@ BATCH_SIZE = 100
 EPOCH = 1000
 
 IS_PROTO = os.getenv("PROTOTYPING_DEVELOP") == "True"
+
 if IS_PROTO:
     print("[PROTOTYPING MODE]")
 
@@ -112,6 +115,9 @@ class HistorySaver(keras.callbacks.Callback):
 
 if __name__ == "__main__":
 
+    if not is_colab():
+        gdrive_mng = GoogleDriveFacade()
+
     ## 乱数
     np.random.seed(123)
     tf.random.set_seed(123)
@@ -197,7 +203,29 @@ if __name__ == "__main__":
     print(f"start:{start}")
     print(f"end:{end} model_name:{MODEL_NAME}")
 
+    ##web hook
+    url = "https://discord.com/api/webhooks/1094787057072734329/SWHyvUiWsMf6uDEH2TlVg-wT6nPdGoWJi9ljFsmABs6TgyzUOyzmiwsCeuRBFUvghCPX"
+    content = {
+        "content": f"{MODEL_NAME}: train finish. loss:{score[0]:3f}, acc:{score[1]:3f}"
+    }
+    headers = {"Content-Type": "application/json"}
+    requests.post(url, json.dumps(content), headers=headers)
+
     plot.plot(train_history, OUTPUT_FIG_FILE_NAME)
+
+    if not is_colab():
+        # モデルアップロード
+        gdrive_mng.upload(
+            local_file_path=OUTPUT_FILE_NAME,
+            save_folder_id="1r3nNbTkJk77eMMSVq-zXRz_gBaVbtd1x",
+            is_convert=True,
+        )
+        # 図アップロード
+        gdrive_mng.upload(
+            local_file_path=OUTPUT_FIG_FILE_NAME,
+            save_folder_id="1r3nNbTkJk77eMMSVq-zXRz_gBaVbtd1x",
+            is_convert=True,
+        )
 
     if is_colab():
         with open(OUTPUT_LATEST_FIG_POS, "w") as f:
