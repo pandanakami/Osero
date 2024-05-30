@@ -6,8 +6,6 @@ def plot(history, savepos):
     loss = [item["loss"] for item in history]
     val_loss = [item["val_loss"] for item in history]
 
-    # fig準備
-    fig = plt.figure()
     # font
     plt.rc("font", family="serif")
     # plot
