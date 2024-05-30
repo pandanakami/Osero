@@ -14,7 +14,7 @@ from my_module.osero_model import INPUT_CHANNEL, OUTPUT_SIZE, MODEL_NAME
 from my_module.osero_model import is_channel_first, get_model
 import my_module.load_data as load_data
 from my_module import plot
-
+import json
 
 print(tf.__version__)
 print(K.__version__)
@@ -62,6 +62,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 OUTPUT_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}.keras")
 OUTPUT_FIG_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}_fig.png")
 OUTPUT_LATEST_FIG_POS = os.path.join(BASE_DIR, "latest_fig_pos.txt")
+CHECK_POINT_HISTORY_NAME = os.path.join(CHECK_POINT_DIR, "history.json")
 
 
 def get_checkpoint_file_name(epoch):
@@ -69,22 +70,44 @@ def get_checkpoint_file_name(epoch):
 
 
 # 保存されたチェックポイントファイルから最大のエポック番号を取得
-def get_latest_checkpoint_epoch(checkpoint_dir):
-    pattern = re.compile(r"epoch_(\d+)_checkpoint\.keras")
-    max_epoch = -1
-    for filename in os.listdir(checkpoint_dir):
-        match = pattern.match(filename)
-        if match:
-            epoch = int(match.group(1))
-            if epoch > max_epoch:
-                max_epoch = epoch
-    return max_epoch
+def get_latest_checkpoint_epoch(train_history):
+    length = len(train_history)
+    if length == 0:
+        return -1
+    else:
+        return train_history[length - 1].get("epoch")
+
+
+train_history = []
 
 
 # カスタムコールバックの定義
-class EpochLogger(keras.callbacks.Callback):
+class HistorySaver(keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs=None):
-        print(f"Epoch {epoch+1} finished. Saving parameters.")
+        save_epoch = epoch + 1
+        print(f"Epoch {save_epoch} finished. Saving parameters.")
+        result = next(
+            (item for item in train_history if item["epoch"] == save_epoch), None
+        )
+        if result:
+            print(f"override history epoch:{save_epoch}")
+            result["loss"] = logs.get("loss")
+            result["accuracy"] = logs.get("accuracy")
+            result["val_loss"] = logs.get("val_loss")
+            result["val_accuracy"] = logs.get("val_accuracy")
+        else:
+            train_history.append(
+                {
+                    "epoch": save_epoch,
+                    "loss": logs.get("loss"),
+                    "accuracy": logs.get("accuracy"),
+                    "val_loss": logs.get("val_loss"),
+                    "val_accuracy": logs.get("val_accuracy"),
+                }
+            )
+            test = json.dumps(train_history, indent=4)
+            with open(CHECK_POINT_HISTORY_NAME, "w") as file:
+                file.write(test)
 
 
 if __name__ == "__main__":
@@ -100,10 +123,15 @@ if __name__ == "__main__":
     )
     print("[end load_data]")
 
+    ## 途中履歴取得
+    if os.path.exists(CHECK_POINT_HISTORY_NAME):
+        with open(CHECK_POINT_HISTORY_NAME, "r") as file:
+            train_history = json.load(file)
+
     ## モデルの定義
     print("[start construct Model]")
     # 最大のエポック番号を取得
-    latest_epoch = get_latest_checkpoint_epoch(CHECK_POINT_DIR)
+    latest_epoch = get_latest_checkpoint_epoch(train_history)
     if latest_epoch != -1:
         # ロード
         model = keras.models.load_model(
@@ -141,7 +169,7 @@ if __name__ == "__main__":
         save_freq="epoch",  # エポックごとに保存
     )
 
-    history = model.fit(
+    model.fit(
         x_train,
         t_train,
         batch_size=BATCH_SIZE,
@@ -152,7 +180,7 @@ if __name__ == "__main__":
         callbacks=[
             keras.callbacks.EarlyStopping(monitor="val_loss", patience=5),
             checkpoint_callback,
-            EpochLogger(),
+            HistorySaver(),
         ],
     )
     print("[end training]")
@@ -169,7 +197,7 @@ if __name__ == "__main__":
     print(f"start:{start}")
     print(f"end:{end} model_name:{MODEL_NAME}")
 
-    plot.plot(history, OUTPUT_FIG_FILE_NAME)
+    plot.plot(train_history, OUTPUT_FIG_FILE_NAME)
 
     if is_colab():
         with open(OUTPUT_LATEST_FIG_POS, "w") as f:

@@ -2,8 +2,9 @@ import matplotlib.pyplot as plt
 
 
 def plot(history, savepos):
-    loss = history.history["loss"]
-    val_loss = history.history["val_loss"]
+    # history構造直す
+    loss = [item["loss"] for item in history]
+    val_loss = [item["val_loss"] for item in history]
 
     # fig準備
     fig = plt.figure()
