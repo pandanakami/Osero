@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot(history, savepos):
+def plot(history, savepos, is_colab):
     # history構造直す
     loss = [item["loss"] for item in history]
     val_loss = [item["val_loss"] for item in history]
@@ -18,6 +18,9 @@ def plot(history, savepos):
     plt.ylabel("loss")
     # 凡例
     plt.legend()
-    # 描画
-    # plt.show()
-    plt.savefig(savepos)
+
+    if is_colab:
+        plt.savefig(savepos)
+    else:
+        # 描画
+        plt.show()
