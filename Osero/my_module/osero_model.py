@@ -2,11 +2,12 @@ from my_module.model import model_cmn
 
 #####################################################
 # モデル切り替え
-from my_module.model import Simple_02 as m
+from my_module.model import Simple_04 as m
 
 #####################################################
 
-MODEL_NAME = m.MODEL_NAME
+MODEL_NAME = m.MODEL_NAME.split(".")[-1]
+
 INPUT_CHANNEL = model_cmn.INPUT_CHANNEL
 OSERO_HEIGHT = model_cmn.OSERO_HEIGHT
 OSERO_WIDTH = model_cmn.OSERO_WIDTH
