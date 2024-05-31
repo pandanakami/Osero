@@ -43,6 +43,33 @@ def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
         )
 
 
+def conv_bn(
+    model, kernel_size, out_size, activation_layer_obj, is_padding=True, is_start=False
+):
+    padding = "same" if is_padding else "valid"
+    if is_start:
+        model.add(
+            Conv2D(
+                out_size,
+                kernel_size=(kernel_size, kernel_size),
+                input_shape=input_shape(),
+                padding=padding,
+                kernel_initializer=keras.initializers.he_normal,
+            )
+        )
+    else:
+        model.add(
+            Conv2D(
+                out_size,
+                kernel_size=(kernel_size, kernel_size),
+                padding=padding,
+                kernel_initializer=keras.initializers.he_normal,
+            )
+        )
+    model.add(BatchNormalization())
+    model.add(activation_layer_obj)
+
+
 # モデルついかしておく、accuracyも併記、earlystoppingカスタム
 
 
