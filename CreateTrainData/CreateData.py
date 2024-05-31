@@ -87,7 +87,7 @@ def enable_replace(x, y, user, field_data, i, j):
     if not (0 <= x and x < WIDTH and 0 <= y and y < HEIGHT):
         return False
     # 置いた隣が相手でない　無視
-    if not field_data[y][x] == other_user:
+    if field_data[y][x] != other_user:
         return False
     # 以降一つでも相手がある
     while True:

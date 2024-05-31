@@ -27,6 +27,7 @@ from my_module.param import (
     OUTPUT_FILE_NAME,
     TRAIN_INPUT_DIR,
 )
+from my_module.custom_eval import custom_eval
 import json
 
 print("[version info]")
@@ -137,6 +138,11 @@ if __name__ == "__main__":
     score = model.evaluate(x_eval, t_eval, verbose=0)
     print("[end evaluate]")
     print(f"\tloss:{score[0]:3f}, acc:{score[1]:3f}\n")
+
+    ## 評価(置けるか否か)
+    y_eval = model.predict(x_eval)
+    custom_acc = custom_eval(x_eval, y_eval)
+    print(f"\tenable_put_acc:{custom_acc[0]:3f}, {custom_acc[1]:3f}\n")
 
     ##保存
     model.save(OUTPUT_FILE_NAME)
