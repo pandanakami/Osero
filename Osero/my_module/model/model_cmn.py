@@ -1,5 +1,5 @@
 from tensorflow import keras
-from keras.layers import Conv2D, Dense
+from keras.layers import Conv2D, Dense, BatchNormalization
 
 INPUT_CHANNEL = 3
 OSERO_HEIGHT = 8
@@ -52,6 +52,17 @@ def dense(out_size, activation):
         activation=activation,
         kernel_initializer=keras.initializers.he_normal,
     )
+
+
+def dense_bn(model, out_size, activation_fn):
+    model.add(
+        Dense(
+            out_size,
+            kernel_initializer=keras.initializers.he_normal,
+        )
+    )
+    model.add(BatchNormalization())
+    model.add(activation_fn)
 
 
 def model_debug_disp(model):

@@ -1,8 +1,7 @@
 import os
 import numpy as np
-from my_module.osero_model import INPUT_CHANNEL, OUTPUT_SIZE
+from my_module.osero_model import INPUT_CHANNEL
 from my_module.osero_model import is_channel_first
-from tensorflow import keras
 from sklearn.model_selection import train_test_split
 
 
