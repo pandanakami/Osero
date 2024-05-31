@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 
 
-def plot(history, savepos, is_colab):
+def plot(history, savepos, display_fig, save_fig):
     # history構造直す
     epochs = [item["epoch"] for item in history]
     loss = [item["loss"] for item in history]
@@ -42,8 +42,9 @@ def plot(history, savepos, is_colab):
     fig.tight_layout()
     plt.title("Training and Validation Loss and Accuracy")
 
-    if is_colab:
-        plt.savefig(savepos)
-    else:
+    if display_fig:
         # 描画
         plt.show()
+
+    if save_fig:
+        plt.savefig(savepos)
