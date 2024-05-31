@@ -1,5 +1,5 @@
 import os
-
+import sys
 import keras
 import tensorflow as tf
 
@@ -171,3 +171,6 @@ if __name__ == "__main__":
     if is_colab():
         with open(OUTPUT_LATEST_FIG_POS, "w") as f:
             f.write(OUTPUT_FIG_FILE_PATH)
+
+    print("[end training]")
+    sys.exit(1)
