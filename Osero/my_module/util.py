@@ -5,15 +5,15 @@ import os
 
 parser = argparse.ArgumentParser(description="Example script with arguments")
 # 引数を追加
-parser.add_argument("-f", "--forceproto", action="store_true", help="Force prototype")
+parser.add_argument("-fp", "--force_proto", action="store_true", help="Force prototype")
 parser.add_argument(
-    "-d", "--detail_discord_ntfy", action="store_true", help="Detail discord ntfy"
+    "-dn", "--detail_discord_ntfy", action="store_true", help="Detail discord ntfy"
 )
 parser.add_argument("-df", "--display_fig", action="store_true", help="Display fig")
 parser.add_argument("-sf", "--save_fig", action="store_true", help="Save fig")
 
 parser.add_argument(
-    "-n",
+    "-nu",
     "--not_upload_to_gdrive",
     action="store_true",
     help="Not upload result to gdrive",
@@ -22,14 +22,15 @@ parser.add_argument(
 args = parser.parse_args()
 
 print("[Args]")
-print(f"\t--forceproto:{args.forceproto}")
+print(f"\t--force_proto:{args.force_proto}")
 print(f"\t--detail_discord_ntfy:{args.detail_discord_ntfy}")
+print(f"\t--not_upload_to_gdrive:{args.not_upload_to_gdrive}")
 print(f"\t--display_fig:{args.display_fig}")
 print(f"\t--save_fig:{args.save_fig}")
 
 ################################ 定数
 
-IS_PROTO = os.getenv("PROTOTYPING_DEVELOP") == "True" or args.forceproto
+IS_PROTO = os.getenv("PROTOTYPING_DEVELOP") == "True" or args.force_proto
 
 
 # google colab起動か否か
