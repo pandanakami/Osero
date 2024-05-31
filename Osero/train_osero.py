@@ -29,9 +29,9 @@ from my_module.param import (
 )
 import json
 
-
-print(tf.__version__)
-print(keras.__version__)
+print("[version info]")
+print(f"\tTensorflow:{tf.__version__}")
+print(f"\tKeras:{keras.__version__}")
 
 BATCH_SIZE = 100
 EPOCH = 1000
@@ -39,7 +39,7 @@ EPOCH = 1000
 args = util.args
 
 if IS_PROTO:
-    print("[PROTOTYPING MODE]")
+    print("MODE = PROTOTYPING MODE")
 
 os.makedirs(CHECK_POINT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)

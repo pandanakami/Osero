@@ -21,10 +21,11 @@ parser.add_argument(
 # 引数を解析
 args = parser.parse_args()
 
-print(f"--forceproto:{args.forceproto}")
-print(f"--detail_discord_ntfy:{args.detail_discord_ntfy}")
-print(f"--display_fig:{args.display_fig}")
-print(f"--save_fig:{args.save_fig}")
+print("[Args]")
+print(f"\t--forceproto:{args.forceproto}")
+print(f"\t--detail_discord_ntfy:{args.detail_discord_ntfy}")
+print(f"\t--display_fig:{args.display_fig}")
+print(f"\t--save_fig:{args.save_fig}")
 
 ################################ 定数
 

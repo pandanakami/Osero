@@ -55,6 +55,7 @@ def dense(out_size, activation):
 
 
 def model_debug_disp(model):
+    print("[debug_model_info]")
     # レイヤー情報
     for i, layer in enumerate(model.layers):
         weights = layer.get_weights()
@@ -66,4 +67,4 @@ def model_debug_disp(model):
             for j, o in enumerate(weights):
                 k += str(o.shape) + ", "
             s += f", weights_shape:{k}"
-        print(f"{s}output_shape:{layer.output_shape}")
+        print(f"\t{s}output_shape:{layer.output_shape}")
