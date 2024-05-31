@@ -54,7 +54,7 @@ def dense(out_size, activation):
     )
 
 
-def dense_bn(model, out_size, activation_fn):
+def dense_bn(model, out_size, activation_layer_obj):
     model.add(
         Dense(
             out_size,
@@ -62,7 +62,7 @@ def dense_bn(model, out_size, activation_fn):
         )
     )
     model.add(BatchNormalization())
-    model.add(activation_fn)
+    model.add(activation_layer_obj)
 
 
 def model_debug_disp(model):

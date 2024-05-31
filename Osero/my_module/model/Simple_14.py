@@ -38,11 +38,11 @@ def get_model(DEBUG=False):
     model.add(Flatten())
 
     # 全結合層
-    dense_bn(model, 256, keras.activations.relu)
+    dense_bn(model, 256, keras.layers.ReLU())
     model.add(Dropout(0.5))
-    dense_bn(model, 128, keras.activations.relu)
+    dense_bn(model, 128, keras.layers.ReLU())
     model.add(Dropout(0.5))
-    dense_bn(model, 64, keras.activations.relu)
+    dense_bn(model, 64, keras.layers.ReLU())
     model.add(Dropout(0.5))
 
     # 出力層
