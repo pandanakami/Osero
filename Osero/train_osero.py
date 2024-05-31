@@ -44,6 +44,11 @@ if IS_PROTO:
 else:
     print("\tFULL MODE")
 
+print("[MODEL]")
+print(f"\t{MODEL_NAME}")
+
+print("\n")
+
 os.makedirs(CHECK_POINT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -65,7 +70,7 @@ if __name__ == "__main__":
     (x_train, t_train), (x_val, t_val), (x_eval, t_eval) = load_data.load_data(
         TRAIN_INPUT_DIR
     )
-    print("[end load_data]")
+    print("[end load_data]\n")
 
     ## 途中履歴取得
     if os.path.exists(CHECK_POINT_HISTORY_NAME):
@@ -90,7 +95,6 @@ if __name__ == "__main__":
         model = get_model(True)
         initial_epoch = 0
         print("No checkpoint found. Starting training from scratch.")
-    print(f"model:{MODEL_NAME}")
 
     ## 学習プロセスを設定する
     model.compile(
@@ -126,19 +130,21 @@ if __name__ == "__main__":
             ),
         ],
     )
-    print("[end training]")
+    print("[end training]\n")
 
     ## 評価
     print("[start evaluate]")
     score = model.evaluate(x_eval, t_eval, verbose=0)
-    print(f"[end evaluate] loss:{score[0]:3f}, acc:{score[1]:3f}")
+    print("[end evaluate]")
+    print(f"\tloss:{score[0]:3f}, acc:{score[1]:3f}\n")
 
     ##保存
     model.save(OUTPUT_FILE_NAME)
 
     end = datetime.datetime.now()
-    print(f"start:{start}")
-    print(f"end:{end} model_name:{MODEL_NAME}")
+    print("[TIME]")
+    print(f"\tstart:{start}")
+    print(f"\tend:{end}")
 
     ##web hook
     util.discord_write(
