@@ -2,7 +2,7 @@ from my_module.model import model_cmn
 
 #####################################################
 # モデル切り替え
-from my_module.model import Simple_12 as m
+from my_module.model import Simple_00 as m
 
 #####################################################
 
