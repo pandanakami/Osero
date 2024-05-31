@@ -1,8 +1,16 @@
 from my_module.model import model_cmn
+import my_module.util as util
+import importlib
 
 #####################################################
 # モデル切り替え
-from my_module.model import Simple_13 as m
+if util.args.module:
+    # 起動引数で指定されている場合
+    module_path = "my_module.model."
+    m = importlib.import_module(module_path + util.args.module)
+else:
+    from my_module.model import Simple_00 as m
+
 
 #####################################################
 

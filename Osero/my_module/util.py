@@ -18,6 +18,9 @@ parser.add_argument(
     action="store_true",
     help="Not upload result to gdrive",
 )
+
+parser.add_argument("-m", "--module", type=str, default="", help="Module Specify")
+
 # 引数を解析
 args = parser.parse_args()
 
@@ -27,6 +30,7 @@ print(f"\t--detail_discord_ntfy:{args.detail_discord_ntfy}")
 print(f"\t--not_upload_to_gdrive:{args.not_upload_to_gdrive}")
 print(f"\t--display_fig:{args.display_fig}")
 print(f"\t--save_fig:{args.save_fig}")
+print(f"\t--module:{args.module if args.module else 'default'}")
 
 ################################ 定数
 
