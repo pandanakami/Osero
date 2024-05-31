@@ -38,8 +38,10 @@ EPOCH = 1000
 
 args = util.args
 
+print("[MODE]")
 if IS_PROTO:
-    print("MODE = PROTOTYPING MODE")
+    print("\tPROTOTYPING MODE")
+else:
 
 os.makedirs(CHECK_POINT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
@@ -173,4 +175,4 @@ if __name__ == "__main__":
             f.write(OUTPUT_FIG_FILE_PATH)
 
     print("[end training]")
-    sys.exit(1)
+    sys.exit()
