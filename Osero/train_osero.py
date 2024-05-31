@@ -42,6 +42,7 @@ print("[MODE]")
 if IS_PROTO:
     print("\tPROTOTYPING MODE")
 else:
+    print("\tFULL MODE")
 
 os.makedirs(CHECK_POINT_DIR, exist_ok=True)
 os.makedirs(OUTPUT_DIR, exist_ok=True)
