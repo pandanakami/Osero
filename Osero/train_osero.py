@@ -28,6 +28,7 @@ from my_module.param import (
     TRAIN_INPUT_DIR,
 )
 from my_module.custom_eval import custom_eval
+import eval_osero
 import json
 
 print("[version info]")
@@ -68,9 +69,12 @@ if __name__ == "__main__":
 
     ## データ取得
     print("[start load_data]")
-    (x_train, t_train), (x_val, t_val), (x_eval, t_eval) = load_data.load_data(
-        TRAIN_INPUT_DIR
-    )
+    (
+        (x_train, t_train),
+        (x_val, t_val),
+        (x_eval, t_eval),
+        (x_eval_difficult, t_eval_difficult),
+    ) = load_data.load_data(TRAIN_INPUT_DIR)
     print("[end load_data]\n")
 
     ## 途中履歴取得
@@ -134,15 +138,13 @@ if __name__ == "__main__":
     print("[end training]\n")
 
     ## 評価
-    print("[start evaluate]")
-    score = model.evaluate(x_eval, t_eval, verbose=0)
-    print("[end evaluate]")
-    print(f"\tloss:{score[0]:3f}, acc:{score[1]:3f}\n")
+    eval_osero.evaluate(x_eval, t_eval)
+
+    ## 評価(難しいやつ)
+    eval_osero.evaluate(x_eval_difficult, t_eval_difficult, True)
 
     ## 評価(置けるか否か)
-    y_eval = model.predict(x_eval)
-    custom_acc = custom_eval(x_eval, y_eval)
-    print(f"\tenable_put_acc:{custom_acc[0]:3f}, {custom_acc[1]:3f}\n")
+    eval_osero.evaluate_enable_put(model, x_eval)
 
     ##保存
     model.save(OUTPUT_FILE_NAME)
