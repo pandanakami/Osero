@@ -138,7 +138,7 @@ if __name__ == "__main__":
     print("[end training]\n")
 
     ## 評価
-    eval_osero.evaluate(model, x_eval, t_eval)
+    score = eval_osero.evaluate(model, x_eval, t_eval)
 
     ## 評価(難しいやつ)
     eval_osero.evaluate(model, x_eval_difficult, t_eval_difficult, True)

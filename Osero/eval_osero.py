@@ -44,6 +44,8 @@ def evaluate(model, x, t, is_difficult=False):
     print(f"[end {tag}]")
     print(f"\tloss:{score[0]:3f}, acc:{score[1]:3f}\n")
 
+    return score
+
 
 # 評価(置けるか否か)
 def evaluate_enable_put(model, x_eval):
