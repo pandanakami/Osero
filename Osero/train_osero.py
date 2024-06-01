@@ -138,10 +138,10 @@ if __name__ == "__main__":
     print("[end training]\n")
 
     ## 評価
-    eval_osero.evaluate(x_eval, t_eval)
+    eval_osero.evaluate(model, x_eval, t_eval)
 
     ## 評価(難しいやつ)
-    eval_osero.evaluate(x_eval_difficult, t_eval_difficult, True)
+    eval_osero.evaluate(model, x_eval_difficult, t_eval_difficult, True)
 
     ## 評価(置けるか否か)
     eval_osero.evaluate_enable_put(model, x_eval)

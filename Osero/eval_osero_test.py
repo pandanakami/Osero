@@ -3,6 +3,7 @@ import os
 import keras
 import tensorflow as tf
 import numpy as np
+import eval_osero
 
 from my_module.osero_model import MODEL_NAME, load_model
 
@@ -33,25 +34,6 @@ print(f"\t{MODEL_NAME}")
 print("\n")
 
 
-# 評価
-def evaluate(model, x, t, is_difficult=False):
-
-    tag = "difficult evaluate" if is_difficult else "evaluate"
-
-    ## 評価
-    print(f"[start {tag}]")
-    score = model.evaluate(x, t, verbose=0)
-    print(f"[end {tag}]")
-    print(f"\tloss:{score[0]:3f}, acc:{score[1]:3f}\n")
-
-
-# 評価(置けるか否か)
-def evaluate_enable_put(model, x_eval):
-    ## 評価(置けるか否か)
-    y_eval = model.predict(x_eval)
-    custom_acc = custom_eval(x_eval, y_eval)
-    print(f"\tenable_put_acc:{custom_acc[0]:3f}, {custom_acc[1]:3f}\n")
-
 
 if __name__ == "__main__":
 
@@ -78,6 +60,6 @@ if __name__ == "__main__":
         # 評価(難しいデータ)
         print("[Model]")
         print(f"\t{model_name}")
-        evaluate(model, x_eval_difficult, t_eval_difficult, True)
+        eval_osero.evaluate(model, x_eval_difficult, t_eval_difficult, True)
 
     sys.exit()
