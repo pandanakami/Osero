@@ -4,7 +4,7 @@ import keras
 import tensorflow as tf
 import numpy as np
 import eval_osero
-
+from my_module.param import OUTPUT_DIR
 from my_module.osero_model import MODEL_NAME, load_model
 
 import my_module.load_data as load_data
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         if i==9:
             continue
         model_name = f"Simple_{i:02d}"
-        name = f"output/{model_name}_proto.keras"
+        name  = os.path.join(OUTPUT_DIR, f"{model_name}_proto.keras")
         ## モデルの読み込み
         model = load_model(name)
 
