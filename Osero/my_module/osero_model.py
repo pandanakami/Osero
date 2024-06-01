@@ -1,6 +1,9 @@
 from my_module.model import model_cmn
 import my_module.util as util
 import importlib
+import keras
+import numpy as np
+import os
 
 #####################################################
 # モデル切り替え
@@ -9,7 +12,7 @@ if util.args.module:
     module_path = "my_module.model."
     m = importlib.import_module(module_path + util.args.module)
 else:
-    from my_module.model import Simple_00 as m
+    from my_module.model import Simple_21 as m
 
 
 #####################################################
@@ -33,3 +36,43 @@ def input_shape():
 
 def get_model(DEBUG=False):
     return m.get_model(DEBUG)
+
+
+def load_model(file_name) -> keras.models.Sequential:
+
+    ## モデルの読み込み
+    if util.is_windows():
+        """
+        windowsだと他環境で作ったモデルのロードができない。
+        ts, kerasバージョン合わせても同じ。
+        推測だけど、tensorflow-intelがよろしくないのでは。
+        なので、初期モデル作って、ウェイトをロードするようにする
+        """
+        model = get_model(True)
+        weights = _load_weights_for_windows(file_name)
+        model.set_weights(weights)
+        ## 学習プロセスを設定する
+        model.compile(
+            loss=keras.losses.SparseCategoricalCrossentropy(),
+            optimizer=keras.optimizers.Adam(),
+            # 評価関数を指定
+            metrics=[keras.metrics.Accuracy().name],
+        )
+
+    else:
+        model = keras.models.load_model(file_name)
+    return model
+
+
+def _load_weights_for_windows(file_name):
+    name = os.path.basename(file_name)
+    dir = os.path.dirname(file_name)
+    name = os.path.splitext(name)[0]
+    input_dir = os.path.join(dir, name)
+
+    ret = []
+    # 指定フォルダ内の全ファイルを削除
+    for filename in os.listdir(input_dir):
+        file_path = os.path.join(input_dir, filename)
+        ret.append(np.load(file_path))
+    return ret

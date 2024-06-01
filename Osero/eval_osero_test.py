@@ -66,16 +66,18 @@ if __name__ == "__main__":
     )
     print("[end load_data]\n")
 
-    ## モデルの読み込み
-    model = load_model(OUTPUT_FILE_NAME)
 
-    # 評価
-    evaluate(model, x_eval, t_eval)
+    for i in range(0,22):
+        if i==9:
+            continue
+        model_name = f"Simple_{i:02d}"
+        name = f"output/{model_name}_proto.keras"
+        ## モデルの読み込み
+        model = load_model(name)
 
-    # 評価(難しいデータ)
-    evaluate(model, x_eval_difficult, t_eval_difficult, True)
+        # 評価(難しいデータ)
+        print("[Model]")
+        print(f"\t{model_name}")
+        evaluate(model, x_eval_difficult, t_eval_difficult, True)
 
-    ## 評価(置けるか否か)
-    evaluate_enable_put(model, x_eval)
-    
     sys.exit()

@@ -43,6 +43,10 @@ def is_colab():
     return "COLAB_GPU" in os.environ
 
 
+def is_windows():
+    return os.name == "nt"
+
+
 ################################ 関数
 
 
