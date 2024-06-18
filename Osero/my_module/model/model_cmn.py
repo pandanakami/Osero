@@ -32,6 +32,7 @@ def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
             input_shape=input_shape(),
             padding=padding,
             kernel_initializer=keras.initializers.he_normal,
+            dtype="float32",
         )
     else:
         return Conv2D(
@@ -40,6 +41,7 @@ def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
             activation=activation,
             padding=padding,
             kernel_initializer=keras.initializers.he_normal,
+            dtype="float32",
         )
 
 
@@ -55,6 +57,7 @@ def conv_bn(
                 input_shape=input_shape(),
                 padding=padding,
                 kernel_initializer=keras.initializers.he_normal,
+                dtype="float32",
             )
         )
     else:
@@ -64,6 +67,7 @@ def conv_bn(
                 kernel_size=(kernel_size, kernel_size),
                 padding=padding,
                 kernel_initializer=keras.initializers.he_normal,
+                dtype="float32",
             )
         )
     model.add(BatchNormalization())
@@ -78,14 +82,14 @@ def dense(out_size, activation):
         out_size,
         activation=activation,
         kernel_initializer=keras.initializers.he_normal,
+        dtype="float32",
     )
 
 
 def dense_bn(model, out_size, activation_layer_obj):
     model.add(
         Dense(
-            out_size,
-            kernel_initializer=keras.initializers.he_normal,
+            out_size, kernel_initializer=keras.initializers.he_normal, dtype="float32"
         )
     )
     model.add(BatchNormalization())

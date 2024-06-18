@@ -11,9 +11,8 @@
 			"program": "${file}",
 			"console": "integratedTerminal",
 			"args": [
-				"-fp",
 				"-m",
-				"Simple_21"
+				"Simple_22"
 			]
 		}
 	]

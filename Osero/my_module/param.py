@@ -23,8 +23,10 @@ else:
     else:
         TRAIN_INPUT_DIR = "../CreateTrainData/output"
 
-    CHECK_POINT_DIR = f"./checkpoints_{SAVE_NAME}"
-    OUTPUT_DIR = "./output"
+    script_path = os.path.abspath(__file__)
+    module_home_dir = os.path.dirname(os.path.dirname(script_path))
+    CHECK_POINT_DIR = os.path.join(module_home_dir, f"checkpoints_{SAVE_NAME}")
+    OUTPUT_DIR = os.path.join(module_home_dir, "output")
 
 OUTPUT_FILE_NAME = os.path.join(OUTPUT_DIR, f"{SAVE_NAME}.keras")
 OUTPUT_FIG_FILE_NAME = f"{SAVE_NAME}_fig.png"
