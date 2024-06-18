@@ -22,7 +22,14 @@ def input_shape():
         return (OSERO_HEIGHT, OSERO_HEIGHT, INPUT_CHANNEL)
 
 
-def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
+def conv(
+    kernel_size,
+    out_size,
+    activation,
+    is_padding=True,
+    is_start=False,
+    kernel_regularizer=False,
+):
     padding = "same" if is_padding else "valid"
     if is_start:
         return Conv2D(
@@ -32,6 +39,7 @@ def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
             input_shape=input_shape(),
             padding=padding,
             kernel_initializer=keras.initializers.he_normal,
+            kernel_regularizer="l2" if kernel_regularizer else None,
             dtype="float32",
         )
     else:
@@ -41,12 +49,19 @@ def conv(kernel_size, out_size, activation, is_padding=True, is_start=False):
             activation=activation,
             padding=padding,
             kernel_initializer=keras.initializers.he_normal,
+            kernel_regularizer="l2" if kernel_regularizer else None,
             dtype="float32",
         )
 
 
 def conv_bn(
-    model, kernel_size, out_size, activation_layer_obj, is_padding=True, is_start=False
+    model,
+    kernel_size,
+    out_size,
+    activation_layer_obj,
+    is_padding=True,
+    is_start=False,
+    kernel_regularizer=False,
 ):
     padding = "same" if is_padding else "valid"
     if is_start:
@@ -57,6 +72,7 @@ def conv_bn(
                 input_shape=input_shape(),
                 padding=padding,
                 kernel_initializer=keras.initializers.he_normal,
+                kernel_regularizer="l2" if kernel_regularizer else None,
                 dtype="float32",
             )
         )
@@ -67,6 +83,7 @@ def conv_bn(
                 kernel_size=(kernel_size, kernel_size),
                 padding=padding,
                 kernel_initializer=keras.initializers.he_normal,
+                kernel_regularizer="l2" if kernel_regularizer else None,
                 dtype="float32",
             )
         )
@@ -77,19 +94,23 @@ def conv_bn(
 # モデルついかしておく、accuracyも併記、earlystoppingカスタム
 
 
-def dense(out_size, activation):
+def dense(out_size, activation, kernel_regularizer=False):
     return Dense(
         out_size,
         activation=activation,
         kernel_initializer=keras.initializers.he_normal,
+        kernel_regularizer="l2" if kernel_regularizer else None,
         dtype="float32",
     )
 
 
-def dense_bn(model, out_size, activation_layer_obj):
+def dense_bn(model, out_size, activation_layer_obj, kernel_regularizer=False):
     model.add(
         Dense(
-            out_size, kernel_initializer=keras.initializers.he_normal, dtype="float32"
+            out_size,
+            kernel_initializer=keras.initializers.he_normal,
+            kernel_regularizer="l2" if kernel_regularizer else None,
+            dtype="float32",
         )
     )
     model.add(BatchNormalization())
