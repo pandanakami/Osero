@@ -23,7 +23,7 @@ for i in range(progress.loop_index, 10):
 
     if progress.get_state() == ProgressState.END_SELF_PLAY:
         # パラメータ更新部
-        train_network()
+        train_network(i)
         progress.set_state(ProgressState.END_TRAIN)
 
     is_update = False

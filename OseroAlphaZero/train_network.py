@@ -4,16 +4,28 @@
 
 # パッケージのインポート
 from dual_network import DN_INPUT_SHAPE
-from keras.callbacks import LearningRateScheduler, LambdaCallback
+from keras.callbacks import (
+    LearningRateScheduler,
+    LambdaCallback,
+    ModelCheckpoint,
+    TensorBoard,
+    EarlyStopping,
+)
 from keras.models import load_model, Model
 from keras import backend as K
 from pathlib import Path
 import numpy as np
 import pickle
 from path_mng import get_path
+import os
+
 
 # パラメータの準備
 RN_EPOCHS = 100  # 学習回数
+
+
+def checkpoint_dir(cycle: int):
+    return "checkpoint/" + str(cycle)
 
 
 # 学習データの読み込み
@@ -23,8 +35,75 @@ def load_data():
         return pickle.load(f)
 
 
+def callbacks(cycle: int):
+
+    ret = []
+
+    # チェックポイント
+    cb = ModelCheckpoint(
+        filepath=get_path(checkpoint_dir(cycle) + "/{epoch:03d}_model_checkpoint.h5"),
+        save_weights_only=True,
+        save_best_only=False,
+        verbose=0,
+        monitor="val_loss",
+        period=20,
+        mode="auto",
+    )
+    ret.append(cb)
+
+    # TensorBoard
+    cb = TensorBoard(log_dir=get_path(f"tb_log/{cycle}"), histogram_freq=1)
+    ret.append(cb)
+
+    # EarlyStopping
+    # cb = EarlyStopping(monitor="val_loss", patience=5)
+    # ret.append(cb)
+
+    # 学習率
+    def step_decay(epoch):
+        x = 0.001
+        if epoch >= 50:
+            x = 0.0005
+        if epoch >= 80:
+            x = 0.00025
+        return x
+
+    cb = LearningRateScheduler(step_decay)
+    ret.append(cb)
+
+    # CB
+    cb = LambdaCallback(
+        on_epoch_begin=lambda epoch, logs: print(
+            "\rTrain {}/{}".format(epoch + 1, RN_EPOCHS), end=""
+        )
+    )
+    ret.append(cb)
+
+    return ret
+
+
+# 再開時はモデルロード
+def _load_model_if_resume(model: Model, cycle: int) -> int:
+
+    # モデルロード
+    initial_epoch = 0
+    dir_path = get_path(checkpoint_dir(cycle))
+    if os.path.exists(dir_path):
+        # 再開
+        files = files = os.listdir(dir_path)
+        if len(files) > 0:
+            # 一番最後の要素(ファイル名)を取得
+            files = sorted(files)
+            file = files[-1]
+            # 先頭3文字(epoch)数値化。これを開始エポックにする
+            initial_epoch = int(file[:3])
+            model.load_weights(os.path.join(dir_path, file))
+
+    return initial_epoch
+
+
 # デュアルネットワークの学習
-def train_network():
+def train_network(cycle: int):
     # 学習データの読み込み
     history = load_data()
     xs, y_policies, y_values = zip(*history)
@@ -39,26 +118,10 @@ def train_network():
     # ベストプレイヤーのモデルの読み込み
     model: Model = load_model(get_path("./model/best.h5"))
 
+    initial_epoch = _load_model_if_resume(model, cycle)
+
     # モデルのコンパイル
     model.compile(loss=["categorical_crossentropy", "mse"], optimizer="adam")
-
-    # 学習率
-    def step_decay(epoch):
-        x = 0.001
-        if epoch >= 50:
-            x = 0.0005
-        if epoch >= 80:
-            x = 0.00025
-        return x
-
-    lr_decay = LearningRateScheduler(step_decay)
-
-    # 出力
-    print_callback = LambdaCallback(
-        on_epoch_begin=lambda epoch, logs: print(
-            "\rTrain {}/{}".format(epoch + 1, RN_EPOCHS), end=""
-        )
-    )
 
     # 学習の実行
     model.fit(
@@ -67,7 +130,8 @@ def train_network():
         batch_size=128,
         epochs=RN_EPOCHS,
         verbose=0,
-        callbacks=[lr_decay, print_callback],
+        callbacks=[callbacks(cycle)],
+        initial_epoch=initial_epoch,
     )
     print("")
 
@@ -81,4 +145,4 @@ def train_network():
 
 # 動作確認
 if __name__ == "__main__":
-    train_network()
+    train_network(999)
