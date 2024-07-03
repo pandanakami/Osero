@@ -5,11 +5,12 @@
 # パッケージのインポート
 from dual_network import DN_INPUT_SHAPE
 from keras.callbacks import LearningRateScheduler, LambdaCallback
-from keras.models import load_model
+from keras.models import load_model, Model
 from keras import backend as K
 from pathlib import Path
 import numpy as np
 import pickle
+from path_mng import get_path
 
 # パラメータの準備
 RN_EPOCHS = 100  # 学習回数
@@ -17,7 +18,7 @@ RN_EPOCHS = 100  # 学習回数
 
 # 学習データの読み込み
 def load_data():
-    history_path = sorted(Path("./data").glob("*.history"))[-1]
+    history_path = sorted(Path(get_path("./data")).glob("*.history"))[-1]
     with history_path.open(mode="rb") as f:
         return pickle.load(f)
 
@@ -36,7 +37,7 @@ def train_network():
     y_values = np.array(y_values)
 
     # ベストプレイヤーのモデルの読み込み
-    model = load_model("./model/best.h5")
+    model: Model = load_model(get_path("./model/best.h5"))
 
     # モデルのコンパイル
     model.compile(loss=["categorical_crossentropy", "mse"], optimizer="adam")
@@ -71,7 +72,7 @@ def train_network():
     print("")
 
     # 最新プレイヤーのモデルの保存
-    model.save("./model/latest.h5")
+    model.save(get_path("./model/latest.h5"))
 
     # モデルの破棄
     K.clear_session()

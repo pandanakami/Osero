@@ -6,23 +6,27 @@
 from game import State
 from dual_network import DN_INPUT_SHAPE
 from math import sqrt
-from keras.models import load_model
+from keras.models import load_model, Model
 from pathlib import Path
 import numpy as np
+import sys
+from tqdm import tqdm
+from path_mng import get_path
 
 # パラメータの準備
 PV_EVALUATE_COUNT = 50  # 1推論あたりのシミュレーション回数（本家は1600）
 
 
 # 推論
-def predict(model, state):
+def predict(model: Model, state):
+    global pred_count
     # 推論のための入力データのシェイプの変換
     a, b, c = DN_INPUT_SHAPE
     x = np.array([state.pieces, state.enemy_pieces])
     x = x.reshape(c, a, b).transpose(1, 2, 0).reshape(1, a, b, c)
 
     # 推論
-    y = model.predict(x, batch_size=1)
+    y = model.predict(x, batch_size=1, verbose=0)
 
     # 方策の取得
     policies = y[0][0][list(state.legal_actions())]  # 合法手のみ
@@ -141,7 +145,7 @@ def boltzman(xs, temperature):
 # 動作確認
 if __name__ == "__main__":
     # モデルの読み込み
-    path = sorted(Path("./model").glob("*.h5"))[-1]
+    path = sorted(Path(get_path("./model")).glob("*.h5"))[-1]
     model = load_model(str(path))
 
     # 状態の生成

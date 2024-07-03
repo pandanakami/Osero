@@ -7,6 +7,7 @@ from dual_network import dual_network
 from enum import Enum
 import pickle
 import os
+from path_mng import get_path
 
 
 class ProgressState(Enum):
@@ -32,32 +33,35 @@ class Progress:
     # コンストラクタ
     def __init__(self):
         self.loop_index = 0
-        self.state: ProgressState = ProgressState.UNINIT
+        self._state: ProgressState = ProgressState.UNINIT
 
     # 初期化
     def init(self):
-        if self.state != ProgressState.UNINIT:
+        if self._state != ProgressState.UNINIT:
             # 初期化済
             return
 
         # デュアルネットワークの作成
         dual_network()
-        self.state = ProgressState.START
+        self._state = ProgressState.START
         self.loop_index = 0
         self._save()
 
     # ループ更新
     def update_loop(self):
         self.loop_index += 1
-        self.state = ProgressState.START
+        self._state = ProgressState.START
         self._save()
 
     # 状態更新
     def set_state(self, state: ProgressState):
         if state == ProgressState.UNINIT:
             raise RuntimeError("だめ")
-        self.state = state
+        self._state = state
         self._save()
+
+    def get_state(self):
+        return self._state
 
     # ファイル保存
     def _save(self):

@@ -17,6 +17,7 @@ from keras.regularizers import l2
 from keras import backend as K
 import os
 from game import BOARD_WIDTH, BOARD_SIZE
+from path_mng import get_path
 
 # パラメータの準備
 DN_FILTERS = 128  # 畳み込み層のカーネル数（本家は256）
@@ -56,7 +57,7 @@ def residual_block():
 # デュアルネットワークの作成
 def dual_network():
     # モデル作成済みの場合は無処理
-    if os.path.exists("./model/best.h5"):
+    if os.path.exists(get_path("./model/best.h5")):
         return
 
     # 入力層
@@ -87,8 +88,8 @@ def dual_network():
     model = Model(inputs=input, outputs=[p, v])
 
     # モデルの保存
-    os.makedirs("./model/", exist_ok=True)  # フォルダがない時は生成
-    model.save("./model/best.h5")  # ベストプレイヤーのモデル
+    os.makedirs(get_path("./model/"), exist_ok=True)  # フォルダがない時は生成
+    model.save(get_path("./model/best.h5"))  # ベストプレイヤーのモデル
 
     # モデルの破棄
     K.clear_session()

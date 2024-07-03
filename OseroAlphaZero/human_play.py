@@ -10,9 +10,13 @@ from pathlib import Path
 from threading import Thread
 import tkinter as tk
 from game import BOARD_WIDTH, BOARD_SIZE
+from path_mng import get_path
 
 # ベストプレイヤーのモデルの読み込み
-model = load_model("./model/best.h5")
+model = load_model(get_path("./model/best.h5"))
+
+GRID_SIZE = 40
+VIEW_SIZE = GRID_SIZE * BOARD_WIDTH
 
 
 # ゲームUIの定義
@@ -29,7 +33,9 @@ class GameUI(tk.Frame):
         self.next_action = pv_mcts_action(model, 0.0)
 
         # キャンバスの生成
-        self.c = tk.Canvas(self, width=240, height=240, highlightthickness=0)
+        self.c = tk.Canvas(
+            self, width=VIEW_SIZE, height=VIEW_SIZE, highlightthickness=0
+        )
         self.c.bind("<Button-1>", self.turn_of_human)
         self.c.pack()
 
@@ -49,8 +55,8 @@ class GameUI(tk.Frame):
             return
 
         # クリック位置を行動に変換
-        x = int(event.x / 40)
-        y = int(event.y / 40)
+        x = int(event.x / GRID_SIZE)
+        y = int(event.y / GRID_SIZE)
         if x < 0 or BOARD_WIDTH - 1 < x or y < 0 or BOARD_WIDTH - 1 < y:  # 範囲外
             return
         action = x + y * BOARD_WIDTH
@@ -84,8 +90,8 @@ class GameUI(tk.Frame):
 
     # 石の描画
     def draw_piece(self, index, first_player):
-        x = (index % BOARD_WIDTH) * 40 + 5
-        y = int(index / BOARD_WIDTH) * 40 + 5
+        x = (index % BOARD_WIDTH) * GRID_SIZE + 5
+        y = int(index / BOARD_WIDTH) * GRID_SIZE + 5
         if first_player:
             self.c.create_oval(
                 x, y, x + 30, y + 30, width=1.0, outline="#000000", fill="#C2272D"
@@ -98,10 +104,14 @@ class GameUI(tk.Frame):
     # 描画の更新
     def on_draw(self):
         self.c.delete("all")
-        self.c.create_rectangle(0, 0, 240, 240, width=0.0, fill="#C69C6C")
-        for i in range(1, 8):
-            self.c.create_line(0, i * 40, 240, i * 40, width=1.0, fill="#000000")
-            self.c.create_line(i * 40, 0, i * 40, 240, width=1.0, fill="#000000")
+        self.c.create_rectangle(0, 0, VIEW_SIZE, VIEW_SIZE, width=0.0, fill="#C69C6C")
+        for i in range(1, BOARD_WIDTH + 2):
+            self.c.create_line(
+                0, i * GRID_SIZE, VIEW_SIZE, i * GRID_SIZE, width=1.0, fill="#000000"
+            )
+            self.c.create_line(
+                i * GRID_SIZE, 0, i * GRID_SIZE, VIEW_SIZE, width=1.0, fill="#000000"
+            )
         for i in range(BOARD_SIZE):
             if self.state.pieces[i] == 1:
                 self.draw_piece(i, self.state.is_first_player())
