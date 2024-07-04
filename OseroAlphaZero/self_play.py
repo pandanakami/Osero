@@ -68,9 +68,11 @@ def game_play(
     progress_list: list,
     signal_list: list,
 ):
-
+    print(f":::::::({identifier})")
     try:
         while True:
+            print(f"game_play({identifier})")
+
             if signal_list[identifier] == SIGNAL_WAIT:
                 time.sleep(1)
                 continue
@@ -193,6 +195,7 @@ def self_play(progress: Progress):
                     ]
                     # 非同期実行中
                     while any(future.running() for future in futures):
+                        print("progress...")
                         if -1 in progress_list:
                             raise KeyboardInterrupt()
                         # 進捗バー

@@ -132,4 +132,4 @@ if __name__ == "__main__":
     progress = Progress.load()
     progress.print()
 
-print("load start : progress")
+print("load end : progress")
