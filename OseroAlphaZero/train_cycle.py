@@ -3,13 +3,13 @@
 # ====================
 
 # パッケージのインポート
-
-from self_play import self_play
-from train_network import train_network
-from evaluate_network import evaluate_network
-from progress import Progress, ProgressState
-from play_with_old_othero import test_with_old_model
-from path_mng import tqdm
+if __name__ == "__main__":
+    from self_play import self_play
+    from train_network import train_network
+    from evaluate_network import evaluate_network
+    from progress import Progress, ProgressState
+    from play_with_old_othero import test_with_old_model
+    from path_mng import tqdm
 
 
 def main():
