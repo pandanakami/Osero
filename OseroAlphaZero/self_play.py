@@ -78,7 +78,6 @@ def play(model):
             pbar.update(1)
 
     except KeyboardInterrupt as e:
-        pbar.close()
         raise e
 
     # 学習データに価値を追加
@@ -110,21 +109,23 @@ def self_play(progress: Progress):
                 history = pickle.load(f)
         initial_count = progress.play_count
         print(f"play start at :{initial_count}")
-        for _ in tqdm(
-            range(initial_count, SP_GAME_COUNT),
-            desc="PlayCount",
-            leave=True,
-            initial=initial_count,
-        ):
-            # 1ゲームの実行
-            h = play(model)
-            history.extend(h)
-            # テンポラリ保存
-            with open(path, "wb") as f:
-                history = pickle.dump(history, f)
-            progress.update_play_count()
+
+        with tqdm(
+            total=SP_GAME_COUNT, initial=initial_count, desc="PlayCount", leave=True
+        ) as pbar:
+
+            for _ in range(initial_count, SP_GAME_COUNT):
+                # 1ゲームの実行
+                h = play(model)
+                history.extend(h)
+                # テンポラリ保存
+                with open(path, "wb") as f:
+                    history = pickle.dump(history, f)
+                progress.update_play_count()
+                pbar.update(1)
 
     except KeyboardInterrupt as e:
+
         raise e
 
     # 学習データの保存
