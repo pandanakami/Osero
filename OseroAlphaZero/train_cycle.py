@@ -1,6 +1,7 @@
 # ====================
 # 学習サイクルの実行
 # ====================
+print("load start : train_cycle")
 
 # パッケージのインポート
 if __name__ == "__main__":
@@ -48,3 +49,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+print("load end : train_cycle")

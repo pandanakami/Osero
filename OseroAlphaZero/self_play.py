@@ -2,10 +2,9 @@
 # セルフプレイ部
 # ====================
 
+print("load start : self_play")
+
 # パッケージのインポート
-from game import State
-from pv_mcts import pv_mcts_scores
-from dual_network import DN_OUTPUT_SIZE, dual_network
 from datetime import datetime
 from keras.models import load_model, Model, clone_model
 from keras import backend as K
@@ -14,11 +13,16 @@ import numpy as np
 import pickle
 import os
 import sys
-from path_mng import get_path, tqdm, is_colab
-from progress import Progress
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager
 import time
+
+from game import State
+from pv_mcts import pv_mcts_scores
+from dual_network import DN_OUTPUT_SIZE, dual_network
+from path_mng import get_path, tqdm, is_colab
+from progress import Progress
+
 
 # パラメータの準備
 SP_GAME_COUNT = 1000  # セルフプレイを行うゲーム数（本家は25000）
@@ -251,3 +255,6 @@ def self_play(progress: Progress):
 # 動作確認
 if __name__ == "__main__":
     self_play()
+
+
+print("load end : self_play")

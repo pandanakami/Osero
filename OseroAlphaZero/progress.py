@@ -2,6 +2,8 @@
 # 学習サイクルの実行
 # ====================
 
+print("load start : progress")
+
 # パッケージのインポート
 from dual_network import dual_network
 from enum import Enum
@@ -129,3 +131,5 @@ class Progress:
 if __name__ == "__main__":
     progress = Progress.load()
     progress.print()
+
+print("load start : progress")

@@ -2,6 +2,8 @@
 # モンテカルロ木探索の作成
 # ====================
 
+print("load start : pv_mcts")
+
 # パッケージのインポート
 from game import State
 from dual_network import DN_INPUT_SHAPE
@@ -167,3 +169,5 @@ if __name__ == "__main__":
 
         # 文字列表示
         print(state)
+
+print("load end : pv_mcts")

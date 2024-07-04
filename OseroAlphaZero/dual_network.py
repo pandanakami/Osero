@@ -1,6 +1,7 @@
 # ====================
 # デュアルネットワークの作成
 # ====================
+print("load start : dual_network")
 
 # パッケージのインポート
 from keras.layers import (
@@ -99,3 +100,5 @@ def dual_network():
 # 動作確認
 if __name__ == "__main__":
     dual_network()
+
+print("load end : dual_network")
