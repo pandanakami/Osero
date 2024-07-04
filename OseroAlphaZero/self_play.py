@@ -5,7 +5,7 @@
 # パッケージのインポート
 from game import State
 from pv_mcts import pv_mcts_scores
-from dual_network import DN_OUTPUT_SIZE
+from dual_network import DN_OUTPUT_SIZE, dual_network
 from datetime import datetime
 from keras.models import load_model
 from keras import backend as K
@@ -94,7 +94,11 @@ def self_play():
     history = []
 
     # ベストプレイヤーのモデルの読み込み
-    model = load_model(get_path("./model/best.h5"))
+    path = get_path("./model/best.h5")
+    if not os.path.exists(path):
+        dual_network()
+
+    model = load_model(path)
 
     # 複数回のゲームの実行
     try:

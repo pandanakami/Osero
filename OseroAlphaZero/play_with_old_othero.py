@@ -2,7 +2,8 @@ import sys
 import os
 
 module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../Osero"))
-sys.path.append(module_path)
+if module_path not in sys.path:
+    sys.path.append(module_path)
 import keras.backend as K
 from keras.models import Model, load_model
 import my_module.osero_model_wrap as mw
