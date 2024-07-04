@@ -14,7 +14,7 @@ from tqdm import tqdm
 from path_mng import get_path
 
 # パラメータの準備
-PV_EVALUATE_COUNT = 50  # 1推論あたりのシミュレーション回数（本家は1600）
+PV_EVALUATE_COUNT = 100  # 1推論あたりのシミュレーション回数（本家は1600）
 
 
 # 推論

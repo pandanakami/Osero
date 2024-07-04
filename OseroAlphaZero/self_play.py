@@ -18,7 +18,7 @@ from tqdm import tqdm
 from path_mng import get_path
 
 # パラメータの準備
-SP_GAME_COUNT = 500  # セルフプレイを行うゲーム数（本家は25000）
+SP_GAME_COUNT = 1000  # セルフプレイを行うゲーム数（本家は25000）
 SP_TEMPERATURE = 1.0  # ボルツマン分布の温度パラメータ
 
 
