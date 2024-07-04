@@ -197,9 +197,7 @@ def self_play(progress: Progress):
 
                     # 非同期プレイ開始
                     futures = [
-                        executor.submit(
-                            game_play, copy_models[i], i, progress_list, signal_list
-                        )
+                        executor.submit(game_play, None, i, progress_list, signal_list)
                         for i in range(MULTI_TASK_NUM)
                     ]
                     # 非同期実行中
