@@ -13,10 +13,12 @@ from keras.callbacks import (
 )
 from keras.models import load_model, Model
 from keras import backend as K
+from keras.metrics import Accuracy
 from pathlib import Path
 import numpy as np
 import pickle
 from path_mng import get_path
+
 import os
 
 
@@ -30,7 +32,7 @@ def checkpoint_dir(cycle: int):
 
 # 学習データの読み込み
 def load_data():
-    history_path = sorted(Path(get_path("./data")).glob("*.history"))[-1]
+    history_path = sorted(Path(get_path("./game_history")).glob("*.history"))[-1]
     with history_path.open(mode="rb") as f:
         return pickle.load(f)
 
@@ -111,6 +113,7 @@ def train_network(cycle: int):
     # 学習のための入力データのシェイプの変換
     a, b, c = DN_INPUT_SHAPE
     xs = np.array(xs)
+    # 自状態、相手状態でone-hot化
     xs = xs.reshape(len(xs), c, a, b).transpose(0, 2, 3, 1)
     y_policies = np.array(y_policies)
     y_values = np.array(y_values)
@@ -121,7 +124,11 @@ def train_network(cycle: int):
     initial_epoch = _load_model_if_resume(model, cycle)
 
     # モデルのコンパイル
-    model.compile(loss=["categorical_crossentropy", "mse"], optimizer="adam")
+    model.compile(
+        loss=["categorical_crossentropy", "mse"],
+        optimizer="adam",
+        metrics=[Accuracy().name],
+    )
 
     # 学習の実行
     model.fit(

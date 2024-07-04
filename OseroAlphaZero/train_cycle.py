@@ -8,6 +8,7 @@ from self_play import self_play
 from train_network import train_network
 from evaluate_network import evaluate_network
 from progress import Progress, ProgressState
+from play_with_old_othero import test_with_old_model
 from tqdm import tqdm
 
 # 進捗読む
@@ -29,11 +30,11 @@ for i in range(progress.loop_index, 10):
     is_update = False
     if progress.get_state() == ProgressState.END_TRAIN:
         # 新パラメータ評価部
-        is_update = evaluate_network()
+        evaluate_network()
         progress.set_state(ProgressState.END_EVALUATE)
 
-    # 強さチェック入れたい
-    if is_update:
-        pass
+    if progress.get_state() == ProgressState.END_EVALUATE:
+        test_with_old_model(progress)
+        progress.set_state(ProgressState.END_CHECK)
 
     progress.update_loop()

@@ -12,6 +12,7 @@ from shutil import copy
 import numpy as np
 from tqdm import tqdm
 from path_mng import get_path
+from progress import Progress
 import os
 
 # パラメータの準備
@@ -62,7 +63,7 @@ def play(next_actions):
 # ベストプレイヤーの交代
 def update_best_player():
     if os.path.exists(get_path("./model/best.h5")):
-        #1個だけバックアップ
+        # 1個だけバックアップ
         copy(get_path("./model/best.h5"), get_path("./model/best2.h5"))
 
     copy(get_path("./model/latest.h5"), get_path("./model/best.h5"))
@@ -70,7 +71,7 @@ def update_best_player():
 
 
 # ネットワークの評価
-def evaluate_network():
+def evaluate_network(progress: Progress):
     # 最新プレイヤーのモデルの読み込み
     model0 = load_model(get_path("./model/latest.h5"))
 
@@ -94,6 +95,7 @@ def evaluate_network():
     # 平均ポイントの計算
     average_point = total_point / EN_GAME_COUNT
     print("AveragePoint", average_point)
+    progress.add_eval_result(average_point)
 
     # モデルの破棄
     K.clear_session()
@@ -110,4 +112,6 @@ def evaluate_network():
 
 # 動作確認
 if __name__ == "__main__":
-    evaluate_network()
+    progress = Progress()
+    evaluate_network(progress)
+    progress.print()

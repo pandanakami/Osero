@@ -2,4 +2,6 @@
 /tb_log*
 /progress*
 /data*
+/game_history*
 /model*
+/.venv*

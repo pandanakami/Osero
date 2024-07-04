@@ -8,6 +8,7 @@ from enum import Enum
 import pickle
 import os
 from path_mng import get_path
+import json
 
 
 class ProgressState(Enum):
@@ -16,9 +17,17 @@ class ProgressState(Enum):
     END_SELF_PLAY = 1
     END_TRAIN = 2
     END_EVALUATE = 3
+    END_CHECK = 4
 
 
-PROGRESS_PATH = "progress/progress.pkl"
+PROGRESS_PATH = get_path("progress/progress.pkl")
+PROGRESS_JSON_PATH = get_path("progress/progress.json")
+
+
+class VsOldModelResult:
+    def __init__(self, old=0, new=0):
+        self.old_model_win = old
+        self.new_model_win = new
 
 
 class Progress:
@@ -34,6 +43,9 @@ class Progress:
     def __init__(self):
         self.loop_index = 0
         self._state: ProgressState = ProgressState.UNINIT
+        self.eval_result = []
+        self.vs_old_result = []
+        self.vs_old_pred_only_result = []
 
     # 初期化
     def init(self):
@@ -63,8 +75,52 @@ class Progress:
     def get_state(self):
         return self._state
 
+    def add_eval_result(self, result: float):
+        if len(self.eval_result) <= self.loop_index:
+            self.eval_result.append(result)
+        else:
+            self.eval_result[self.loop_index] = result
+        self._save()
+
+    def add_vs_old_result(self, result: VsOldModelResult):
+        if len(self.vs_old_result) <= self.loop_index:
+            self.vs_old_result.append(result)
+        else:
+            self.vs_old_result[self.loop_index] = result
+        self._save()
+
+    def add_vs_old_pred_only_result(self, result: VsOldModelResult):
+        if len(self.vs_old_pred_only_result) <= self.loop_index:
+            self.vs_old_pred_only_result.append(result)
+        else:
+            self.vs_old_pred_only_result[self.loop_index] = result
+        self._save()
+
     # ファイル保存
     def _save(self):
         os.makedirs(os.path.dirname(PROGRESS_PATH), exist_ok=True)
         with open(PROGRESS_PATH, mode="wb") as f:
             pickle.dump(self, f)
+
+    def print(self):
+        print(f"loop index:{self.loop_index}")
+        print(f"state:{self._state}")
+
+        print("eval")
+        for i, o in enumerate(self.eval_result):
+            print(f"{i}:: eval rate:{o}")
+
+        print("vs old")
+        for i, _o in enumerate(self.vs_old_result):
+            o: VsOldModelResult = _o
+            print(f"{i}:: old_win:{o.old_model_win}, new_win:{o.new_model_win}")
+
+        print("vs old(pred only)")
+        for i, _o in enumerate(self.vs_old_pred_only_result):
+            o: VsOldModelResult = _o
+            print(f"{i}:: old_win:{o.old_model_win}, new_win:{o.new_model_win}")
+
+
+if __name__ == "__main__":
+    progress = Progress.load()
+    progress.print()

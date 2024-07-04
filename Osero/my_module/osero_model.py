@@ -12,7 +12,7 @@ if util.args.module:
     module_path = "my_module.model."
     m = importlib.import_module(module_path + util.args.module)
 else:
-    from my_module.model import Simple_23 as m
+    from my_module.model import Simple_22 as m
 
 
 #####################################################

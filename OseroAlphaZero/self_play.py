@@ -33,9 +33,9 @@ def first_player_value(ended_state):
 # 学習データの保存
 def write_data(history):
     now = datetime.now()
-    os.makedirs(get_path("./data/"), exist_ok=True)  # フォルダがない時は生成
+    os.makedirs(get_path("./game_history/"), exist_ok=True)  # フォルダがない時は生成
     path = get_path(
-        "./data/{:04}{:02}{:02}{:02}{:02}{:02}.history".format(
+        "./game_history/{:04}{:02}{:02}{:02}{:02}{:02}.history".format(
             now.year, now.month, now.day, now.hour, now.minute, now.second
         )
     )
