@@ -14,7 +14,7 @@ import numpy as np
 import pickle
 import os
 import sys
-from path_mng import get_path, tqdm
+from path_mng import get_path, tqdm, is_colab
 from progress import Progress
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from multiprocessing import Manager
@@ -24,7 +24,10 @@ import time
 SP_GAME_COUNT = 1000  # セルフプレイを行うゲーム数（本家は25000）
 SP_TEMPERATURE = 1.0  # ボルツマン分布の温度パラメータ
 
-MULTI_TASK_NUM = 2
+if is_colab():
+    MULTI_TASK_NUM = os.cpu_count()
+else:
+    MULTI_TASK_NUM = 2
 
 
 # 先手プレイヤーの価値
@@ -48,47 +51,82 @@ def write_data(history):
         pickle.dump(history, f)
 
 
-# 1ゲームの実行
-def game_play(model: Model, identifier: int, progress_list: list):
-    # 学習データ
-    history = []
+SIGNAL_RUN = 0
+SIGNAL_WAIT = 1
+SIGNAL_END = 2
+SIGNAL_END_REQ = 3
 
-    # 状態の生成
-    state = State()
+
+# 1ゲームの実行
+def game_play(
+    model: Model,
+    identifier: int,
+    progress_list: list,
+    signal_list: list,
+):
 
     try:
         while True:
-            # ゲーム終了時
-            if state.is_done():
-                break
+            if signal_list[identifier] == SIGNAL_WAIT:
+                time.sleep(1)
+                continue
+            elif signal_list[identifier] == SIGNAL_END:
+                return None
 
-            # 合法手の確率分布の取得
-            scores = pv_mcts_scores(model, state, SP_TEMPERATURE)
+            # SIGNAL_RUN
+            print(f"Game Play Start({identifier})")
+            # 学習データ
+            history = []
 
-            # 学習データに状態と方策を追加
-            policies = [0] * DN_OUTPUT_SIZE
-            for action, policy in zip(state.legal_actions(), scores):
-                policies[action] = policy
-            history.append([[state.pieces, state.enemy_pieces], policies, None])
+            # 状態の生成
+            state = State()
 
-            # 行動の取得
-            action = np.random.choice(state.legal_actions(), p=scores)
+            progress_list[identifier] = 0
 
-            # 次の状態の取得
-            state = state.next(action)
+            while True:
+                if signal_list[identifier] == SIGNAL_END:
+                    return None
 
-            progress_list[identifier] += 1
+                # ゲーム終了時
+                if state.is_done():
+                    break
 
-    except KeyboardInterrupt as e:
-        progress_list[identifier] = -1
+                # 合法手の確率分布の取得
+                scores = pv_mcts_scores(model, state, SP_TEMPERATURE)
+
+                # 学習データに状態と方策を追加
+                policies = [0] * DN_OUTPUT_SIZE
+                for action, policy in zip(state.legal_actions(), scores):
+                    policies[action] = policy
+                history.append([[state.pieces, state.enemy_pieces], policies, None])
+
+                # 行動の取得
+                action = np.random.choice(state.legal_actions(), p=scores)
+
+                # 次の状態の取得
+                state = state.next(action)
+
+                progress_list[identifier] += 1
+
+            # 学習データに価値を追加
+            value = first_player_value(state)
+            for i in range(len(history)):
+                history[i][2] = value
+                value = -value
+
+            # 受け渡し用ファイル保存
+            with open(f"tmp_history{identifier}.pkl", "wb") as f:
+                pickle.dump(history, f)
+
+            # 完了フラグ
+            signal_list[identifier] = SIGNAL_WAIT
+            history.clear()
+
+    except KeyboardInterrupt:
+        signal_list[identifier] = SIGNAL_END_REQ
         return None
 
-    # 学習データに価値を追加
-    value = first_player_value(state)
-    for i in range(len(history)):
-        history[i][2] = value
-        value = -value
-    return history
+    return None
 
 
 # モデルのコピーを作成
@@ -129,6 +167,7 @@ def self_play(progress: Progress):
     try:
         with Manager() as manager:
             progress_list = manager.list([0] * MULTI_TASK_NUM)
+            signal_list = manager.list([SIGNAL_RUN] * MULTI_TASK_NUM)
 
             with tqdm(
                 total=SP_GAME_COUNT,
@@ -140,37 +179,57 @@ def self_play(progress: Progress):
                 with ProcessPoolExecutor(max_workers=MULTI_TASK_NUM) as executor:
 
                     count = initial_count
-                    while True:
-                        # 非同期プレイ開始
-                        futures = [
-                            executor.submit(game_play, copy_models[i], i, progress_list)
-                            for i in range(MULTI_TASK_NUM)
-                        ]
-                        # 非同期実行中
-                        while any(future.running() for future in futures):
-                            if -1 in progress_list:
-                                raise KeyboardInterrupt()
 
+                    # 非同期プレイ開始
+                    futures = [
+                        executor.submit(
+                            game_play, copy_models[i], i, progress_list, signal_list
+                        )
+                        for i in range(MULTI_TASK_NUM)
+                    ]
+                    # 非同期実行中
+                    while any(future.running() for future in futures):
+                        if -1 in progress_list:
+                            raise KeyboardInterrupt()
+                        # 進捗バー
+                        for i in range(MULTI_TASK_NUM):
+                            tqdm_list[i].n = progress_list[i]
+                            tqdm_list[i].refresh()
+                        # 中断チェック
+                        endflag = False
+                        if SIGNAL_END_REQ in signal_list:
+                            endflag = True
+                        else:
+                            # 状態
                             for i in range(MULTI_TASK_NUM):
-                                tqdm_list[i].n = progress_list[i]
-                                tqdm_list[i].refresh()
+                                # 完了
+                                if signal_list[i] == SIGNAL_WAIT:
+                                    # 履歴をファイルから受け取り
+                                    with open(f"tmp_history{i}.pkl", "rb") as f:
+                                        h = pickle.load(f)
+                                        history.extend(h)
+                                    # テンポラリ保存
+                                    with open(path, "wb") as f:
+                                        pickle.dump(history, f)
+                                    progress.update_play_count()
+                                    print(
+                                        f"end play. current history num:{len(history)}"
+                                    )
+                                    count += 1
 
-                            time.sleep(1)
+                                    # 受け取り完了設定
+                                    os.remove(f"tmp_history{i}.pkl")
 
-                        # 非同期完了
-                        for future in as_completed(futures):
-                            h = future.result()
-                            history.extend(h)
-                        # テンポラリ保存
-                        with open(path, "wb") as f:
-                            pickle.dump(history, f)
-                        progress.update_play_count(MULTI_TASK_NUM)
-                        pbar.update(MULTI_TASK_NUM)
-                        print(f"end play. current history num:{len(history)}")
-
-                        count += MULTI_TASK_NUM
-                        if count >= SP_GAME_COUNT:
-                            break
+                                    if count >= SP_GAME_COUNT:
+                                        # 終了
+                                        endflag = True
+                                    else:
+                                        # 継続
+                                        signal_list[i] = SIGNAL_RUN
+                        if endflag:
+                            for i in range(MULTI_TASK_NUM):
+                                signal_list[i] = SIGNAL_END
+                        time.sleep(1)
 
     except KeyboardInterrupt as e:
         for p in tqdm_list:
