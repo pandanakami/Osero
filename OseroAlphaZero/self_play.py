@@ -108,7 +108,7 @@ def self_play(progress: Progress):
             with open(path, "rb") as f:
                 history = pickle.load(f)
         initial_count = progress.play_count
-        print(f"play start at :{initial_count}")
+        print(f"play start at :{initial_count}, history num:{len(history)}")
 
         with tqdm(
             total=SP_GAME_COUNT, initial=initial_count, desc="PlayCount", leave=True
@@ -120,7 +120,7 @@ def self_play(progress: Progress):
                 history.extend(h)
                 # テンポラリ保存
                 with open(path, "wb") as f:
-                    history = pickle.dump(history, f)
+                    pickle.dump(history, f)
                 progress.update_play_count()
                 pbar.update(1)
 
