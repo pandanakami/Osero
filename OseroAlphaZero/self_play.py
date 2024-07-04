@@ -69,14 +69,21 @@ def game_play(
     signal_list: list,
 ):
     print(f":::::::({identifier})")
+
+    # ベストプレイヤーのモデルの読み込み
+    path = get_path("./model/best.h5")
+    if not os.path.exists(path):
+        dual_network()
+
+    model = load_model(path)
+
     try:
         while True:
-            print(f"game_play({identifier})")
-
             if signal_list[identifier] == SIGNAL_WAIT:
                 time.sleep(1)
                 continue
             elif signal_list[identifier] == SIGNAL_END:
+                del model
                 return None
 
             # SIGNAL_RUN
@@ -91,6 +98,7 @@ def game_play(
 
             while True:
                 if signal_list[identifier] == SIGNAL_END:
+                    del model
                     return None
 
                 # ゲーム終了時
@@ -130,6 +138,7 @@ def game_play(
 
     except KeyboardInterrupt:
         signal_list[identifier] = SIGNAL_END_REQ
+        del model
         return None
 
     return None
@@ -195,7 +204,6 @@ def self_play(progress: Progress):
                     ]
                     # 非同期実行中
                     while any(future.running() for future in futures):
-                        print("progress...")
                         if -1 in progress_list:
                             raise KeyboardInterrupt()
                         # 進捗バー
