@@ -118,6 +118,9 @@ def self_play(progress: Progress):
                 # 1ゲームの実行
                 h = play(model)
                 history.extend(h)
+
+                print(f"end play. current history num:{len(history)}")
+
                 # テンポラリ保存
                 with open(path, "wb") as f:
                     pickle.dump(history, f)
