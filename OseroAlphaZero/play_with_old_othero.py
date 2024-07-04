@@ -1,6 +1,8 @@
 import sys
+import os
 
-sys.path.append("../Osero")
+module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../Osero"))
+sys.path.append(module_path)
 import keras.backend as K
 from keras.models import Model, load_model
 import my_module.osero_model_wrap as mw
@@ -234,11 +236,9 @@ def test_with_old_model(progress: Progress):
     global old_model, new_model
     load_old_model()
 
-    """
     progress.add_vs_old_result(
         _test_with_old_model("vs old model", _new_policy_func_mcts)
     )
-    """
 
     progress.add_vs_old_pred_only_result(
         _test_with_old_model("vs old model(pred only)", _new_policy_func_pred_only)
