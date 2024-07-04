@@ -76,8 +76,8 @@ class Progress:
     def get_state(self):
         return self._state
 
-    def update_play_count(self):
-        self.play_count += 1
+    def update_play_count(self, num=1):
+        self.play_count += num
         self._save()
 
     def add_eval_result(self, result: float):

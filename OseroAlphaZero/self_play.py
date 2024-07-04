@@ -7,7 +7,7 @@ from game import State
 from pv_mcts import pv_mcts_scores
 from dual_network import DN_OUTPUT_SIZE, dual_network
 from datetime import datetime
-from keras.models import load_model
+from keras.models import load_model, Model, clone_model
 from keras import backend as K
 from pathlib import Path
 import numpy as np
@@ -16,10 +16,15 @@ import os
 import sys
 from path_mng import get_path, tqdm
 from progress import Progress
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from multiprocessing import Manager
+import time
 
 # パラメータの準備
 SP_GAME_COUNT = 1000  # セルフプレイを行うゲーム数（本家は25000）
 SP_TEMPERATURE = 1.0  # ボルツマン分布の温度パラメータ
+
+MULTI_TASK_NUM = 2
 
 
 # 先手プレイヤーの価値
@@ -44,15 +49,12 @@ def write_data(history):
 
 
 # 1ゲームの実行
-def play(model):
+def game_play(model: Model, identifier: int, progress_list: list):
     # 学習データ
     history = []
 
     # 状態の生成
     state = State()
-
-    # tqdmオブジェクトを初期化
-    pbar = tqdm(desc="GameCount", unit=" iteration", leave=False)
 
     try:
         while True:
@@ -75,10 +77,11 @@ def play(model):
             # 次の状態の取得
             state = state.next(action)
 
-            pbar.update(1)
+            progress_list[identifier] += 1
 
     except KeyboardInterrupt as e:
-        raise e
+        progress_list[identifier] = -1
+        return None
 
     # 学習データに価値を追加
     value = first_player_value(state)
@@ -86,6 +89,13 @@ def play(model):
         history[i][2] = value
         value = -value
     return history
+
+
+# モデルのコピーを作成
+def _create_model_copy(model: Model) -> Model:
+    model_copy = clone_model(model)
+    model_copy.set_weights(model.get_weights())
+    return model_copy
 
 
 # セルフプレイ
@@ -101,34 +111,70 @@ def self_play(progress: Progress):
     model = load_model(path)
     path = ""
 
-    # 複数回のゲームの実行
+    # 履歴をリストア
+    path = get_path("game_history_tmp.pkl")
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            history = pickle.load(f)
+    initial_count = progress.play_count
+    print(f"play start at :{initial_count}, history num:{len(history)}")
+
+    progress_list = []
+    copy_models = []
+    tqdm_list = []
+    for i in range(MULTI_TASK_NUM):
+        copy_models.append(_create_model_copy(model))
+        tqdm_list.append(tqdm(desc=f"GameCount{i}", unit=" iteration", leave=False))
+
     try:
-        path = get_path("game_history_tmp.pkl")
-        if os.path.exists(path):
-            with open(path, "rb") as f:
-                history = pickle.load(f)
-        initial_count = progress.play_count
-        print(f"play start at :{initial_count}, history num:{len(history)}")
+        with Manager() as manager:
+            progress_list = manager.list([0] * MULTI_TASK_NUM)
 
-        with tqdm(
-            total=SP_GAME_COUNT, initial=initial_count, desc="PlayCount", leave=True
-        ) as pbar:
+            with tqdm(
+                total=SP_GAME_COUNT,
+                initial=initial_count,
+                desc="PlayCount",
+                leave=True,
+            ) as pbar:
 
-            for _ in range(initial_count, SP_GAME_COUNT):
-                # 1ゲームの実行
-                h = play(model)
-                history.extend(h)
+                with ProcessPoolExecutor(max_workers=MULTI_TASK_NUM) as executor:
 
-                print(f"end play. current history num:{len(history)}")
+                    count = initial_count
+                    while True:
+                        # 非同期プレイ開始
+                        futures = [
+                            executor.submit(game_play, copy_models[i], i, progress_list)
+                            for i in range(MULTI_TASK_NUM)
+                        ]
+                        # 非同期実行中
+                        while any(future.running() for future in futures):
+                            if -1 in progress_list:
+                                raise KeyboardInterrupt()
 
-                # テンポラリ保存
-                with open(path, "wb") as f:
-                    pickle.dump(history, f)
-                progress.update_play_count()
-                pbar.update(1)
+                            for i in range(MULTI_TASK_NUM):
+                                tqdm_list[i].n = progress_list[i]
+                                tqdm_list[i].refresh()
+
+                            time.sleep(1)
+
+                        # 非同期完了
+                        for future in as_completed(futures):
+                            h = future.result()
+                            history.extend(h)
+                        # テンポラリ保存
+                        with open(path, "wb") as f:
+                            pickle.dump(history, f)
+                        progress.update_play_count(MULTI_TASK_NUM)
+                        pbar.update(MULTI_TASK_NUM)
+                        print(f"end play. current history num:{len(history)}")
+
+                        count += MULTI_TASK_NUM
+                        if count >= SP_GAME_COUNT:
+                            break
 
     except KeyboardInterrupt as e:
-
+        for p in tqdm_list:
+            p.close()
         raise e
 
     # 学習データの保存

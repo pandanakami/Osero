@@ -11,34 +11,40 @@ from progress import Progress, ProgressState
 from play_with_old_othero import test_with_old_model
 from path_mng import tqdm
 
-# 進捗読む
-progress = Progress.load()
 
-try:
-    for i in range(progress.loop_index, 10):
-        print("Train", i, "====================")
+def main():
+    # 進捗読む
+    progress = Progress.load()
 
-        if progress.get_state() == ProgressState.START:
-            # セルフプレイ部
-            self_play(progress)
-            progress.set_state(ProgressState.END_SELF_PLAY)
+    try:
+        for i in range(progress.loop_index, 10):
+            print("Train", i, "====================")
 
-        if progress.get_state() == ProgressState.END_SELF_PLAY:
-            # パラメータ更新部
-            train_network(i)
-            progress.set_state(ProgressState.END_TRAIN)
+            if progress.get_state() == ProgressState.START:
+                # セルフプレイ部
+                self_play(progress)
+                progress.set_state(ProgressState.END_SELF_PLAY)
 
-        is_update = False
-        if progress.get_state() == ProgressState.END_TRAIN:
-            # 新パラメータ評価部
-            evaluate_network()
-            progress.set_state(ProgressState.END_EVALUATE)
+            if progress.get_state() == ProgressState.END_SELF_PLAY:
+                # パラメータ更新部
+                train_network(i)
+                progress.set_state(ProgressState.END_TRAIN)
 
-        if progress.get_state() == ProgressState.END_EVALUATE:
-            test_with_old_model(progress)
-            progress.set_state(ProgressState.END_CHECK)
+            is_update = False
+            if progress.get_state() == ProgressState.END_TRAIN:
+                # 新パラメータ評価部
+                evaluate_network()
+                progress.set_state(ProgressState.END_EVALUATE)
 
-        progress.update_loop()
+            if progress.get_state() == ProgressState.END_EVALUATE:
+                test_with_old_model(progress)
+                progress.set_state(ProgressState.END_CHECK)
 
-except KeyboardInterrupt:
-    print("Keyboard Interrupt.")
+            progress.update_loop()
+
+    except KeyboardInterrupt:
+        print("Keyboard Interrupt.")
+
+
+if __name__ == "__main__":
+    main()
