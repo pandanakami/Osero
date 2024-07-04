@@ -9,7 +9,7 @@ from train_network import train_network
 from evaluate_network import evaluate_network
 from progress import Progress, ProgressState
 from play_with_old_othero import test_with_old_model
-from tqdm import tqdm
+from path_mng import tqdm
 
 # 進捗読む
 progress = Progress.load()
@@ -19,7 +19,7 @@ for i in range(progress.loop_index, 10):
 
     if progress.get_state() == ProgressState.START:
         # セルフプレイ部
-        self_play()
+        self_play(progress)
         progress.set_state(ProgressState.END_SELF_PLAY)
 
     if progress.get_state() == ProgressState.END_SELF_PLAY:

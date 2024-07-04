@@ -43,6 +43,7 @@ class Progress:
     def __init__(self):
         self.loop_index = 0
         self._state: ProgressState = ProgressState.UNINIT
+        self.play_count = 0
         self.eval_result = []
         self.vs_old_result = []
         self.vs_old_pred_only_result = []
@@ -74,6 +75,10 @@ class Progress:
 
     def get_state(self):
         return self._state
+
+    def update_play_count(self):
+        self.play_count += 1
+        self._save()
 
     def add_eval_result(self, result: float):
         if len(self.eval_result) <= self.loop_index:

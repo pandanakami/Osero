@@ -7,6 +7,12 @@ def is_colab():
     return "COLAB_GPU" in os.environ
 
 
+if is_colab():
+    from tqdm.notebook import tqdm as tqdm
+else:
+    from tqdm import tqdm as tqdm
+
+
 def get_path(path):
     if is_colab():
         return os.path.join("/content/drive/MyDrive/osero_rl/", path)

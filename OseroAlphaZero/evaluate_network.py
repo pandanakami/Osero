@@ -10,8 +10,7 @@ from keras import backend as K
 from pathlib import Path
 from shutil import copy
 import numpy as np
-from tqdm import tqdm
-from path_mng import get_path
+from path_mng import get_path, tqdm
 from progress import Progress
 import os
 

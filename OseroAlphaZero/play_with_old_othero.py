@@ -15,7 +15,7 @@ from path_mng import get_path
 from enum import Enum
 from game import State, BOARD_WIDTH, BOARD_SIZE
 import copy
-from tqdm import tqdm
+from path_mng import tqdm
 import math
 from progress import Progress, VsOldModelResult
 from evaluate_network import EN_GAME_COUNT

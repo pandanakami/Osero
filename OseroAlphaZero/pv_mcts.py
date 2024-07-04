@@ -10,8 +10,7 @@ from keras.models import load_model, Model
 from pathlib import Path
 import numpy as np
 import sys
-from tqdm import tqdm
-from path_mng import get_path
+from path_mng import get_path, tqdm
 
 # パラメータの準備
 PV_EVALUATE_COUNT = 100  # 1推論あたりのシミュレーション回数（本家は1600）

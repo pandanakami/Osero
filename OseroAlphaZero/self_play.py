@@ -14,8 +14,8 @@ import numpy as np
 import pickle
 import os
 import sys
-from tqdm import tqdm
-from path_mng import get_path
+from path_mng import get_path, tqdm
+from progress import Progress
 
 # パラメータの準備
 SP_GAME_COUNT = 1000  # セルフプレイを行うゲーム数（本家は25000）
@@ -89,7 +89,7 @@ def play(model):
 
 
 # セルフプレイ
-def self_play():
+def self_play(progress: Progress):
     # 学習データ
     history = []
 
@@ -102,10 +102,13 @@ def self_play():
 
     # 複数回のゲームの実行
     try:
-        for _ in tqdm(range(SP_GAME_COUNT), desc="PlayCount", leave=True):
+        for _ in tqdm(
+            range(progress.play_count, SP_GAME_COUNT), desc="PlayCount", leave=True
+        ):
             # 1ゲームの実行
             h = play(model)
             history.extend(h)
+            progress.update_play_count()
     except KeyboardInterrupt as e:
         raise e
 
