@@ -77,8 +77,9 @@ def play(model):
 
             pbar.update(1)
 
-    except KeyboardInterrupt:
+    except KeyboardInterrupt as e:
         pbar.close()
+        raise e
 
     # 学習データに価値を追加
     value = first_player_value(state)
@@ -99,21 +100,39 @@ def self_play(progress: Progress):
         dual_network()
 
     model = load_model(path)
+    path = ""
 
     # 複数回のゲームの実行
     try:
+        path = get_path("game_history_tmp.pkl")
+        if os.path.exists(path):
+            with open(path, "rb") as f:
+                history = pickle.load(f)
+        initial_count = progress.play_count
+        print(f"play start at :{initial_count}")
         for _ in tqdm(
-            range(progress.play_count, SP_GAME_COUNT), desc="PlayCount", leave=True
+            range(initial_count, SP_GAME_COUNT),
+            desc="PlayCount",
+            leave=True,
+            initial=initial_count,
         ):
             # 1ゲームの実行
             h = play(model)
             history.extend(h)
+            # テンポラリ保存
+            with open(path, "wb") as f:
+                history = pickle.dump(history, f)
             progress.update_play_count()
+
     except KeyboardInterrupt as e:
         raise e
 
     # 学習データの保存
     write_data(history)
+
+    # テンポラリ削除
+    if os.path.exists(path):
+        os.remove(path)
 
     # モデルの破棄
     K.clear_session()

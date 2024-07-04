@@ -14,27 +14,31 @@ from path_mng import tqdm
 # 進捗読む
 progress = Progress.load()
 
-for i in range(progress.loop_index, 10):
-    print("Train", i, "====================")
+try:
+    for i in range(progress.loop_index, 10):
+        print("Train", i, "====================")
 
-    if progress.get_state() == ProgressState.START:
-        # セルフプレイ部
-        self_play(progress)
-        progress.set_state(ProgressState.END_SELF_PLAY)
+        if progress.get_state() == ProgressState.START:
+            # セルフプレイ部
+            self_play(progress)
+            progress.set_state(ProgressState.END_SELF_PLAY)
 
-    if progress.get_state() == ProgressState.END_SELF_PLAY:
-        # パラメータ更新部
-        train_network(i)
-        progress.set_state(ProgressState.END_TRAIN)
+        if progress.get_state() == ProgressState.END_SELF_PLAY:
+            # パラメータ更新部
+            train_network(i)
+            progress.set_state(ProgressState.END_TRAIN)
 
-    is_update = False
-    if progress.get_state() == ProgressState.END_TRAIN:
-        # 新パラメータ評価部
-        evaluate_network()
-        progress.set_state(ProgressState.END_EVALUATE)
+        is_update = False
+        if progress.get_state() == ProgressState.END_TRAIN:
+            # 新パラメータ評価部
+            evaluate_network()
+            progress.set_state(ProgressState.END_EVALUATE)
 
-    if progress.get_state() == ProgressState.END_EVALUATE:
-        test_with_old_model(progress)
-        progress.set_state(ProgressState.END_CHECK)
+        if progress.get_state() == ProgressState.END_EVALUATE:
+            test_with_old_model(progress)
+            progress.set_state(ProgressState.END_CHECK)
 
-    progress.update_loop()
+        progress.update_loop()
+
+except KeyboardInterrupt:
+    print("Keyboard Interrupt.")
