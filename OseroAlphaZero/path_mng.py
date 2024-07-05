@@ -8,7 +8,7 @@ def is_colab():
 
 
 def is_running_on_sagemaker():
-    return "SM_MODEL_DIR" in os.environ
+    return "SAGEMAKER_INTERNAL_IMAGE_URI" in os.environ
 
 
 if is_colab() or is_running_on_sagemaker():
