@@ -55,8 +55,21 @@ def residual_block():
     return f
 
 
-# デュアルネットワークの作成
+# デュアルネットワークの作成+保存
 def dual_network():
+    model = create_dual_network()
+
+    # モデルの保存
+    os.makedirs(get_path("./model/"), exist_ok=True)  # フォルダがない時は生成
+    model.save(get_path("./model/best.h5"))  # ベストプレイヤーのモデル
+
+    # モデルの破棄
+    K.clear_session()
+    del model
+
+
+# デュアルネットワークの作成
+def create_dual_network() -> Model:
     # モデル作成済みの場合は無処理
     if os.path.exists(get_path("./model/best.h5")):
         return
@@ -87,14 +100,6 @@ def dual_network():
 
     # モデルの作成
     model = Model(inputs=input, outputs=[p, v])
-
-    # モデルの保存
-    os.makedirs(get_path("./model/"), exist_ok=True)  # フォルダがない時は生成
-    model.save(get_path("./model/best.h5"))  # ベストプレイヤーのモデル
-
-    # モデルの破棄
-    K.clear_session()
-    del model
 
 
 # 動作確認

@@ -19,7 +19,7 @@ import time
 
 from game import State
 from pv_mcts import pv_mcts_scores
-from dual_network import DN_OUTPUT_SIZE, dual_network
+from dual_network import DN_OUTPUT_SIZE, dual_network, create_dual_network
 from path_mng import get_path, tqdm, is_colab
 from progress import Progress
 
@@ -63,19 +63,18 @@ SIGNAL_END_REQ = 3
 
 # 1ゲームの実行
 def game_play(
-    model: Model,
+    weights: list,
     identifier: int,
     progress_list: list,
     signal_list: list,
 ):
-    print(f":::::::({identifier})")
+    print(f"::::b:::({identifier})")
 
     # ベストプレイヤーのモデルの読み込み
-    path = get_path("./model/best.h5")
-    if not os.path.exists(path):
-        dual_network()
+    model = create_dual_network()
+    model.set_weights(weights)
 
-    model = load_model(path)
+    print(f"after_load_model{identifier})")
 
     try:
         while True:
@@ -161,7 +160,7 @@ def self_play(progress: Progress):
     if not os.path.exists(path):
         dual_network()
 
-    model = load_model(path)
+    model: Model = load_model(path)
     path = ""
 
     # 履歴をリストア
@@ -197,7 +196,13 @@ def self_play(progress: Progress):
 
                     # 非同期プレイ開始
                     futures = [
-                        executor.submit(game_play, None, i, progress_list, signal_list)
+                        executor.submit(
+                            game_play,
+                            model.get_weights(),  # モデル本体は渡せない。シリアライズできないから
+                            i,
+                            progress_list,
+                            signal_list,
+                        )
                         for i in range(MULTI_TASK_NUM)
                     ]
                     # 非同期実行中
