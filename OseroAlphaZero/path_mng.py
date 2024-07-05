@@ -8,7 +8,8 @@ def is_colab():
 
 
 def is_running_on_sagemaker():
-    return "SAGEMAKER_INTERNAL_IMAGE_URI" in os.environ
+    return False
+    # return "SAGEMAKER_INTERNAL_IMAGE_URI" in os.environ
 
 
 if is_colab() or is_running_on_sagemaker():
