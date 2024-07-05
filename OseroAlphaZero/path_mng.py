@@ -7,7 +7,11 @@ def is_colab():
     return "COLAB_GPU" in os.environ
 
 
-if is_colab():
+def is_running_on_sagemaker():
+    return "SM_MODEL_DIR" in os.environ
+
+
+if is_colab() or is_running_on_sagemaker():
     from tqdm.notebook import tqdm as tqdm
 else:
     from tqdm import tqdm as tqdm
