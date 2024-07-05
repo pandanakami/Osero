@@ -72,9 +72,12 @@ def game_play(
     print(f"::::b:::({identifier})")
 
     # ベストプレイヤーのモデルの読み込み
-    model = create_dual_network()
-    print(f"aaaaaaaa{identifier})")
-    model.set_weights(weights)
+    # model = create_dual_network()
+    # print(f"aaaaaaaa{identifier})")
+    # model.set_weights(weights)
+    # ベストプレイヤーのモデルの読み込み
+    path = get_path("./model/best.h5")
+    model: Model = load_model(path)
 
     print(f"after_load_model{identifier})")
 
@@ -107,7 +110,9 @@ def game_play(
                     break
 
                 # 合法手の確率分布の取得
+                print(f"bef({identifier})")
                 scores = pv_mcts_scores(model, state, SP_TEMPERATURE)
+                print(f"aft({identifier})")
 
                 # 学習データに状態と方策を追加
                 policies = [0] * DN_OUTPUT_SIZE
