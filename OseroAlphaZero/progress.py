@@ -2,8 +2,6 @@
 # 学習サイクルの実行
 # ====================
 
-print("load start : progress")
-
 # パッケージのインポート
 from dual_network import dual_network
 from enum import Enum
@@ -78,8 +76,8 @@ class Progress:
     def get_state(self):
         return self._state
 
-    def update_play_count(self, num=1):
-        self.play_count += num
+    def update_play_count(self):
+        self.play_count += 1
         self._save()
 
     def add_eval_result(self, result: float):
@@ -131,5 +129,3 @@ class Progress:
 if __name__ == "__main__":
     progress = Progress.load()
     progress.print()
-
-print("load end : progress")

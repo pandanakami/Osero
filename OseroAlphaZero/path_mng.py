@@ -1,7 +1,5 @@
 import os
 
-print("load start : path_mng")
-
 
 # google colab起動か否か
 def is_colab():
@@ -20,6 +18,3 @@ def get_path(path):
         return os.path.join("/content/drive/MyDrive/osero_rl/", path)
     else:
         return path
-
-
-print("load end : path_mng")

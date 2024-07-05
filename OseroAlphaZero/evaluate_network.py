@@ -1,7 +1,6 @@
 # ====================
 # 新パラメータ評価部
 # ====================
-print("load start : evaluate_network")
 
 # パッケージのインポート
 from game import State
@@ -115,5 +114,3 @@ if __name__ == "__main__":
     progress = Progress()
     evaluate_network(progress)
     progress.print()
-
-print("load end : evaluate_network")

@@ -2,8 +2,6 @@
 # リバーシ
 # ====================
 
-print("load start : game")
-
 # パッケージのインポート
 import random
 import math
@@ -204,5 +202,3 @@ if __name__ == "__main__":
         # 文字列表示
         print(state)
         print()
-
-print("load end : game")

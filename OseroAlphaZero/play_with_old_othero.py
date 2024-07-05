@@ -1,5 +1,3 @@
-print("load start : play_with_old_othero")
-
 import sys
 import os
 
@@ -257,5 +255,3 @@ if __name__ == "__main__":
     progress = Progress()
     test_with_old_model(progress)
     progress.print()
-
-print("load end : play_with_old_othero")

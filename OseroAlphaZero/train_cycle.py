@@ -15,7 +15,6 @@ if __name__ == "__main__":
 
 
 def main():
-    tf.config.threading.set_intra_op_parallelism_threads(1)
 
     # 進捗読む
     progress = Progress.load()
