@@ -32,8 +32,8 @@ class VsOldModelResult:
 
 class Progress:
     # 進捗ファイル読み込み
-    def load():
-        if os.path.exists(PROGRESS_PATH):
+    def load(filepath=PROGRESS_PATH):
+        if os.path.exists(filepath):
             with open(PROGRESS_PATH, mode="rb") as f:
                 return pickle.load(f)
         else:
@@ -102,9 +102,9 @@ class Progress:
         self._save()
 
     # ファイル保存
-    def _save(self):
-        os.makedirs(os.path.dirname(PROGRESS_PATH), exist_ok=True)
-        with open(PROGRESS_PATH, mode="wb") as f:
+    def _save(self, file_path=PROGRESS_PATH):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        with open(file_path, mode="wb") as f:
             pickle.dump(self, f)
 
     def print(self):
