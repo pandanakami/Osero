@@ -18,6 +18,7 @@ from pathlib import Path
 import numpy as np
 import pickle
 from path_mng import get_path
+from sklearn.model_selection import train_test_split
 
 import os
 
@@ -130,15 +131,19 @@ def train_network(cycle: int):
         metrics=[Accuracy().name],
     )
 
+    x_train, x_val, y1_train, y1_val, y2_train, y2_val = train_test_split(
+        xs, y_policies, y_values, test_size=0.1, random_state=4
+    )
     # 学習の実行
     model.fit(
-        xs,
-        [y_policies, y_values],
+        x_train,
+        [y1_train, y2_train],
         batch_size=128,
         epochs=RN_EPOCHS,
         verbose=0,
         callbacks=[callbacks(cycle)],
         initial_epoch=initial_epoch,
+        validation_data=(x_val, [y1_val, y2_val]),
     )
     print("")
 

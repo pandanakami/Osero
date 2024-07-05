@@ -50,32 +50,30 @@ def play(model):
 
     # 状態の生成
     state = State()
-
-    # tqdmオブジェクトを初期化
-    pbar = tqdm(desc="GameCount", unit=" iteration", leave=False)
-
     try:
-        while True:
-            # ゲーム終了時
-            if state.is_done():
-                break
 
-            # 合法手の確率分布の取得
-            scores = pv_mcts_scores(model, state, SP_TEMPERATURE)
+        with tqdm(desc="GameCount", unit=" iteration", leave=False) as pbar:
+            while True:
+                # ゲーム終了時
+                if state.is_done():
+                    break
 
-            # 学習データに状態と方策を追加
-            policies = [0] * DN_OUTPUT_SIZE
-            for action, policy in zip(state.legal_actions(), scores):
-                policies[action] = policy
-            history.append([[state.pieces, state.enemy_pieces], policies, None])
+                # 合法手の確率分布の取得
+                scores = pv_mcts_scores(model, state, SP_TEMPERATURE)
 
-            # 行動の取得
-            action = np.random.choice(state.legal_actions(), p=scores)
+                # 学習データに状態と方策を追加
+                policies = [0] * DN_OUTPUT_SIZE
+                for action, policy in zip(state.legal_actions(), scores):
+                    policies[action] = policy
+                history.append([[state.pieces, state.enemy_pieces], policies, None])
 
-            # 次の状態の取得
-            state = state.next(action)
+                # 行動の取得
+                action = np.random.choice(state.legal_actions(), p=scores)
 
-            pbar.update(1)
+                # 次の状態の取得
+                state = state.next(action)
+
+                pbar.update(1)
 
     except KeyboardInterrupt as e:
         raise e
