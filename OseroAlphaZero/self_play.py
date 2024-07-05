@@ -72,6 +72,7 @@ def game_play(
 
     # ベストプレイヤーのモデルの読み込み
     model = create_dual_network()
+    print(f"aaaaaaaa{identifier})")
     model.set_weights(weights)
 
     print(f"after_load_model{identifier})")

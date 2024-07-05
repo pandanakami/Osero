@@ -57,6 +57,10 @@ def residual_block():
 
 # デュアルネットワークの作成+保存
 def dual_network():
+    # モデル作成済みの場合は無処理
+    if os.path.exists(get_path("./model/best.h5")):
+        return
+
     model = create_dual_network()
 
     # モデルの保存
@@ -70,36 +74,35 @@ def dual_network():
 
 # デュアルネットワークの作成
 def create_dual_network() -> Model:
-    # モデル作成済みの場合は無処理
-    if os.path.exists(get_path("./model/best.h5")):
-        return
 
+    print("0")
     # 入力層
     input = Input(shape=DN_INPUT_SHAPE)
-
+    print("1")
     # 畳み込み層
     x = conv(DN_FILTERS)(input)
     x = BatchNormalization()(x)
     x = Activation("relu")(x)
-
+    print("2")
     # 残差ブロック x 16
     for i in range(DN_RESIDUAL_NUM):
         x = residual_block()(x)
-
+    print("3")
     # プーリング層
     x = GlobalAveragePooling2D()(x)
-
+    print("4")
     # ポリシー出力
     p = Dense(
         DN_OUTPUT_SIZE, kernel_regularizer=l2(0.0005), activation="softmax", name="pi"
     )(x)
-
+    print("5")
     # バリュー出力
     v = Dense(1, kernel_regularizer=l2(0.0005))(x)
     v = Activation("tanh", name="v")(v)
-
+    print("6")
     # モデルの作成
     model = Model(inputs=input, outputs=[p, v])
+    print("7")
 
 
 # 動作確認
