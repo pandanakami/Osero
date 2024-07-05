@@ -11,9 +11,12 @@ if __name__ == "__main__":
     from progress import Progress, ProgressState
     from play_with_old_othero import test_with_old_model
     from path_mng import tqdm
+    import tensorflow as tf
 
 
 def main():
+    tf.config.threading.set_intra_op_parallelism_threads(1)
+
     # 進捗読む
     progress = Progress.load()
 
