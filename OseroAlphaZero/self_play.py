@@ -22,7 +22,7 @@ from pv_mcts import pv_mcts_scores
 from dual_network import DN_OUTPUT_SIZE, dual_network, create_dual_network
 from path_mng import get_path, tqdm, is_colab
 from progress import Progress
-
+import tensorflow as tf
 
 # パラメータの準備
 SP_GAME_COUNT = 1000  # セルフプレイを行うゲーム数（本家は25000）
@@ -68,6 +68,7 @@ def game_play(
     progress_list: list,
     signal_list: list,
 ):
+    tf.config.threading.set_intra_op_parallelism_threads(1)
     print(f"::::b:::({identifier})")
 
     # ベストプレイヤーのモデルの読み込み
