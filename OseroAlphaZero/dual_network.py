@@ -81,7 +81,9 @@ def create_dual_network() -> Model:
     print("1")
     # 畳み込み層
     x = conv(DN_FILTERS)(input)
+    print("1.1")
     x = BatchNormalization()(x)
+    print("1.2")
     x = Activation("relu")(x)
     print("2")
     # 残差ブロック x 16
