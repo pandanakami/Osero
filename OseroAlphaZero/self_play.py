@@ -113,19 +113,20 @@ def self_play(progress: Progress):
         with tqdm(
             total=SP_GAME_COUNT, initial=initial_count, desc="PlayCount", leave=True
         ) as pbar:
+            with tqdm(desc="History num", unit=" iteration", leave=False) as his_pbar:
+                for _ in range(initial_count, SP_GAME_COUNT):
+                    # 1ゲームの実行
+                    h = play(model)
+                    history.extend(h)
 
-            for _ in range(initial_count, SP_GAME_COUNT):
-                # 1ゲームの実行
-                h = play(model)
-                history.extend(h)
+                    his_pbar.n = len(history)
+                    his_pbar.refresh()
 
-                print(f"end play. current history num:{len(history)}")
-
-                # テンポラリ保存
-                with open(path, "wb") as f:
-                    pickle.dump(history, f)
-                progress.update_play_count()
-                pbar.update(1)
+                    # テンポラリ保存
+                    with open(path, "wb") as f:
+                        pickle.dump(history, f)
+                    progress.update_play_count()
+                    pbar.update(1)
 
     except KeyboardInterrupt as e:
 
