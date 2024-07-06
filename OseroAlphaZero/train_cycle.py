@@ -21,7 +21,7 @@ def main():
 
     try:
         for i in range(progress.loop_index, 10):
-            print("Train", i, "====================")
+            print(f"Train{i} state:{progress.get_state()} ====================")
 
             if progress.get_state() == ProgressState.START:
                 # セルフプレイ部

@@ -80,6 +80,10 @@ class Progress:
         self.play_count += 1
         self._save()
 
+    def reset_play_count(self):
+        self.play_count = 0
+        self._save()
+
     def add_eval_result(self, result: float):
         if len(self.eval_result) <= self.loop_index:
             self.eval_result.append(result)

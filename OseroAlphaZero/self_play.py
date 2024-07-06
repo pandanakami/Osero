@@ -141,6 +141,8 @@ def self_play(progress: Progress):
     K.clear_session()
     del model
 
+    progress.update_play_count()
+
 
 # 動作確認
 if __name__ == "__main__":
