@@ -36,7 +36,7 @@ def main():
             is_update = False
             if progress.get_state() == ProgressState.END_TRAIN:
                 # 新パラメータ評価部
-                evaluate_network()
+                evaluate_network(progress)
                 progress.set_state(ProgressState.END_EVALUATE)
 
             if progress.get_state() == ProgressState.END_EVALUATE:
