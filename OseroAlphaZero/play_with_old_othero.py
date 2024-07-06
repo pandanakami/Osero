@@ -65,70 +65,73 @@ def play(old_is_first: bool, new_policy_func, disp_log=False) -> Turn:
     count = 4
     pass_count = 0
 
-    progress = tqdm(desc="StateCount", unit=" iteration", leave=False)
+    with tqdm(desc="StateCount", unit=" iteration", leave=False) as progress:
+        while True:
+            if pass_count == 2:
+                break
+            if count == BOARD_SIZE:
+                break
+            progress.update(1)
 
-    while True:
-        if pass_count == 2:
-            break
-        if count == BOARD_SIZE:
-            break
-        progress.update(1)
+            if turn == Turn.OLD_MODEL:
 
-        if turn == Turn.OLD_MODEL:
+                _data = copy.deepcopy(data)
+                if old_is_first:
+                    for j in range(BOARD_WIDTH):
+                        for i in range(BOARD_WIDTH):
+                            if data[j][i] == W:
+                                _data[j][i] = O
+                            elif data[j][i] == B:
+                                _data[j][i] = S
+                            else:
+                                _data[j][i] = 0
+                else:
+                    _data = data
+                pred = osero_pred.pred(old_model, _data)
+                index = np.argmax(pred)
 
-            _data = copy.deepcopy(data)
-            if old_is_first:
+                turn = Turn.NEW_MODEL
+
+                # pass
+                if index == BOARD_SIZE:
+                    pass_count += 1
+                    continue
+                # 置く
+                _put(data, index, oldModelColor, newModelColor)
+            else:
+                self_state = [
+                    1 if d == newModelColor else 0 for row in data for d in row
+                ]
+                other_state = [
+                    1 if d == oldModelColor else 0 for row in data for d in row
+                ]
+                state = State(self_state, other_state)
+                action = new_policy_func(new_model, state)
+
+                turn = Turn.OLD_MODEL
+
+                if action == BOARD_SIZE:
+                    pass_count += 1
+                    continue
+                # 次の状態の取得
+                state = state.next(action)
+                self_state = state.enemy_pieces  # nextで入れ替わっている
+                other_state = state.pieces
                 for j in range(BOARD_WIDTH):
                     for i in range(BOARD_WIDTH):
-                        if data[j][i] == W:
-                            _data[j][i] = O
-                        elif data[j][i] == B:
-                            _data[j][i] = S
+                        index = j * BOARD_WIDTH + i
+                        if self_state[index] == 1:
+                            data[j][i] = newModelColor
+                        elif other_state[index] == 1:
+                            data[j][i] = oldModelColor
                         else:
-                            _data[j][i] = 0
-            else:
-                _data = data
-            pred = osero_pred.pred(old_model, _data)
-            index = np.argmax(pred)
+                            data[j][i] = 0
 
-            turn = Turn.NEW_MODEL
+            if disp_log:
+                _print_data(data, count)
 
-            # pass
-            if index == BOARD_SIZE:
-                pass_count += 1
-                continue
-            # 置く
-            _put(data, index, oldModelColor, newModelColor)
-        else:
-            self_state = [1 if d == newModelColor else 0 for row in data for d in row]
-            other_state = [1 if d == oldModelColor else 0 for row in data for d in row]
-            state = State(self_state, other_state)
-            action = new_policy_func(new_model, state)
-
-            turn = Turn.OLD_MODEL
-
-            if action == BOARD_SIZE:
-                pass_count += 1
-                continue
-            # 次の状態の取得
-            state = state.next(action)
-            self_state = state.enemy_pieces  # nextで入れ替わっている
-            other_state = state.pieces
-            for j in range(BOARD_WIDTH):
-                for i in range(BOARD_WIDTH):
-                    index = j * BOARD_WIDTH + i
-                    if self_state[index] == 1:
-                        data[j][i] = newModelColor
-                    elif other_state[index] == 1:
-                        data[j][i] = oldModelColor
-                    else:
-                        data[j][i] = 0
-
-        if disp_log:
-            _print_data(data, count)
-
-        count += 1
-        pass_count = 0
+            count += 1
+            pass_count = 0
 
     old_model_count = sum(row.count(oldModelColor) for row in data)
     new_model_count = sum(row.count(newModelColor) for row in data)

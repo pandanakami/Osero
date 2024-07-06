@@ -32,25 +32,24 @@ def play(next_actions):
     # 状態の生成
     state = State()
 
-    # tqdmオブジェクトを初期化
-    pbar = tqdm(desc="GameCount", unit=" iteration", leave=False)
     try:
-        # ゲーム終了までループ
-        while True:
-            # ゲーム終了時
-            if state.is_done():
-                break
+        with tqdm(desc="GameCount", unit=" iteration", leave=False) as pbar:
+            # ゲーム終了までループ
+            while True:
+                # ゲーム終了時
+                if state.is_done():
+                    break
 
-            # 行動の取得
-            next_action = (
-                next_actions[0] if state.is_first_player() else next_actions[1]
-            )
-            action = next_action(state)
+                # 行動の取得
+                next_action = (
+                    next_actions[0] if state.is_first_player() else next_actions[1]
+                )
+                action = next_action(state)
 
-            # 次の状態の取得
-            state = state.next(action)
+                # 次の状態の取得
+                state = state.next(action)
 
-            pbar.update(1)
+                pbar.update(1)
 
     except KeyboardInterrupt:
         pbar.close()
