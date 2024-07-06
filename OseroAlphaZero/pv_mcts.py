@@ -29,7 +29,11 @@ def predict(model: Model, state: State):
     # y = model.predict(x, batch_size=1, verbose=0)
     # 方策の取得
     policies = (y[0][0]).numpy()[list(state.legal_actions())]  # 合法手のみ
-    policies /= sum(policies) if sum(policies) else 1  # 合計1の確率分布に変換
+
+    if sum(policies) < 1e-2:
+        policies = np.array([1.0 / len(policies)] * len(policies))
+    else:
+        policies /= sum(policies) if sum(policies) else 1  # 合計1の確率分布に変換
 
     # 価値の取得
     value = (y[1][0]).numpy()[0]
