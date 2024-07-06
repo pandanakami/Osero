@@ -3,7 +3,7 @@ import pickle
 import os
 
 INPUT_1_DIR = "input1"
-INPUT_2_DIR = "input1"
+INPUT_2_DIR = "input2"
 OUTPUT_DIR = "combine"
 
 
@@ -18,7 +18,7 @@ HISTORY_2_PATH = os.path.join(INPUT_2_DIR, "game_history_tmp.pkl")
 HISTORY_OUTPUT_PATH = os.path.join(OUTPUT_DIR, "game_history_tmp.pkl")
 
 progress1 = Progress.load(PROGRESS_1_PATH)
-progress2 = Progress.load(PROGRESS_1_PATH)
+progress2 = Progress.load(PROGRESS_2_PATH)
 
 with open(HISTORY_1_PATH, "rb") as f:
     history1 = pickle.load(f)

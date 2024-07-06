@@ -140,7 +140,7 @@ def train_network(cycle: int):
         [y1_train, y2_train],
         batch_size=128,
         epochs=RN_EPOCHS,
-        verbose=0,
+        verbose=1,
         callbacks=[callbacks(cycle)],
         initial_epoch=initial_epoch,
         validation_data=(x_val, [y1_val, y2_val]),

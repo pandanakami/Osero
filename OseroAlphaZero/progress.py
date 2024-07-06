@@ -34,7 +34,7 @@ class Progress:
     # 進捗ファイル読み込み
     def load(filepath=PROGRESS_PATH):
         if os.path.exists(filepath):
-            with open(PROGRESS_PATH, mode="rb") as f:
+            with open(filepath, mode="rb") as f:
                 return pickle.load(f)
         else:
             return Progress()
