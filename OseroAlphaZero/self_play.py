@@ -141,7 +141,7 @@ def self_play(progress: Progress):
     K.clear_session()
     del model
 
-    progress.update_play_count()
+    progress.reset_play_count()
 
 
 # 動作確認
