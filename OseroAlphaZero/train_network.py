@@ -34,6 +34,7 @@ def checkpoint_dir(cycle: int):
 # 学習データの読み込み
 def load_data():
     history_path = sorted(Path(get_path("./game_history")).glob("*.history"))[-1]
+    print(f"load history:{history_path}")
     with history_path.open(mode="rb") as f:
         return pickle.load(f)
 
