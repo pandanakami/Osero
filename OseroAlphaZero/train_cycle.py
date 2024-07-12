@@ -44,6 +44,7 @@ def main():
                 progress.set_state(ProgressState.END_CHECK)
 
             progress.update_loop()
+            break
 
     except KeyboardInterrupt:
         print("Keyboard Interrupt.")

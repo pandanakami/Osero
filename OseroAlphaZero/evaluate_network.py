@@ -101,7 +101,7 @@ def evaluate_network(progress: Progress):
     del model1
 
     # ベストプレイヤーの交代
-    if True or average_point > 0.5 or progress.loop_index < 5:
+    if True or average_point > 0.5:
         update_best_player()
         return True
     else:
