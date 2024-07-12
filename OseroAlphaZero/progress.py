@@ -2,8 +2,18 @@
 # 学習サイクルの実行
 # ====================
 
+import os
+
 # パッケージのインポート
-from dual_network import dual_network
+
+if "NOT_USE_MODEL" in os.environ:
+
+    def dual_network():
+        pass
+
+else:
+    from dual_network import dual_network
+
 from enum import Enum
 import pickle
 import os

@@ -1,3 +1,6 @@
+import os
+
+os.environ["NOT_USE_MODEL"] = "True"
 from progress import Progress, ProgressState
 import pickle
 import os
