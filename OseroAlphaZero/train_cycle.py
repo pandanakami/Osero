@@ -12,9 +12,11 @@ if __name__ == "__main__":
     from play_with_old_othero import test_with_old_model
     from path_mng import tqdm
     import tensorflow as tf
+    import os
 
 
 def main():
+    print(f"Running on CPU: {os.sched_getaffinity(0)}")
 
     # 進捗読む
     progress = Progress.load()
