@@ -14,3 +14,4 @@ def reset_progress(loop_index):
 
     if os.path.exists("game_history_tmp.pkl"):
         shutil.rmtree("game_history_tmp.pkl")
+    print(f"do reset, index:{progress.loop_index}")
