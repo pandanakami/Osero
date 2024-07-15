@@ -12,4 +12,5 @@ def reset_progress(loop_index):
     progress.reset_play_count()
     progress.set_state(ProgressState.START)
 
-    shutil.rmtree("game_history_tmp.pkl")
+    if os.path.exists("game_history_tmp.pkl"):
+        shutil.rmtree("game_history_tmp.pkl")
