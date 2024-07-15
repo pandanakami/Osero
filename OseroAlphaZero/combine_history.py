@@ -46,7 +46,7 @@ download("osero_rl", "colab")
 
 # sage maker
 for i in range(4):
-    download(f"osero_rl/sage_maker/{i}", f"colab/{i}")
+    download(f"osero_rl/sage_maker/{i}", f"sage_maker/{i}")
 
 if has_raspi:
     # raspberry pi
