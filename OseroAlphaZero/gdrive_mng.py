@@ -77,7 +77,8 @@ class GoogleDriveMng:
             return self._get_folder_id_by_path(path)
         else:
             folder_path, file_name = path.rsplit("/", 1)
-            folder_id = self._get_folder_id_by_path(folder_path)
+            # フォルダのID取得　なければ作る
+            folder_id = self.create_folder(folder_path)
             return self._get_file_id_by_name(file_name, folder_id)
 
     # 指定したパスのディレクトリを作り、IDを返す
