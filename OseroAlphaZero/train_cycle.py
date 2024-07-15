@@ -15,8 +15,15 @@ if __name__ == "__main__":
     import os
 
 
+def is_windows():
+    return os.name == "nt"
+
+
 def main():
-    print(f"Running on CPU: {os.sched_getaffinity(0)}")
+    if is_windows():
+        print("Running on CPU 0")
+    else:
+        print(f"Running on CPU: {os.sched_getaffinity(0)}")
 
     # 進捗読む
     progress = Progress.load()
