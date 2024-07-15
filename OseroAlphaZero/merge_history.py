@@ -32,7 +32,7 @@ def merge(input1_dir, input2_dir, output_dir):
         progress1.loop_index == progress2.loop_index
         and progress1._state == ProgressState.START
         and progress2._state == ProgressState.START
-    ) or True:
+    ):
         progress1.play_count += progress2.play_count
         history: list = history1
         history.extend(history2)
@@ -47,7 +47,7 @@ def merge(input1_dir, input2_dir, output_dir):
         )
         return True
     else:
-        return False
+        raise IndexError("別ループのデータが混じってる")
 
 
 if __name__ == "__main__":
