@@ -70,7 +70,7 @@ def extend(input_dir, output_dir):
     progress.play_count *= 4
     progress._save(PROGRESS_OUTPUT_PATH)
 
-    print(f"save count:{progress.play_count}, history num:{len(history)}")
+    print(f"extend count:{progress.play_count}, history num:{len(history)}")
 
 
 if __name__ == "__main__":
