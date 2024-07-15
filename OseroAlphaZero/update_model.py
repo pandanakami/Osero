@@ -2,8 +2,14 @@ from gdrive_mng import GoogleDriveMng
 import reset_progress
 import os
 import shutil
+import sys
 
-LOOP_INDEX = 3
+try:
+    LOOP_INDEX = int(sys.argv[1])
+except ValueError:
+    print("Please provide a valid integer.")
+    sys.exit(1)
+
 DO_BACKUP = False
 
 # 履歴リセット
