@@ -4,6 +4,7 @@ import sys
 
 os.environ["NOT_USE_MODEL"] = "True"
 from progress import Progress, ProgressState
+from path_mng import get_path
 
 
 def reset_progress(loop_index):
@@ -13,8 +14,9 @@ def reset_progress(loop_index):
     progress.reset_play_count()
     progress.set_state(ProgressState.START)
 
-    if os.path.exists("game_history_tmp.pkl"):
-        os.remove("game_history_tmp.pkl")
+    path = get_path("game_history_tmp.pkl")
+    if os.path.exists(path):
+        os.remove(path)
     print(f"do reset, index:{progress.loop_index}")
 
 
