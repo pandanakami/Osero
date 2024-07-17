@@ -16,6 +16,7 @@ import os
 import sys
 from path_mng import get_path, tqdm
 from progress import Progress
+import gc
 
 # パラメータの準備
 SP_GAME_COUNT = 600  # セルフプレイを行うゲーム数（本家は25000）
@@ -128,6 +129,9 @@ def self_play(progress: Progress):
                         pickle.dump(history, f)
                     progress.update_play_count()
                     pbar.update(1)
+
+                    del h
+                    gc.collect()
 
     except KeyboardInterrupt as e:
 
