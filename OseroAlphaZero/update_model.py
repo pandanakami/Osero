@@ -3,6 +3,8 @@ import reset_progress
 import os
 import shutil
 import sys
+import calc_hash
+from path_mng import get_path
 
 try:
     LOOP_INDEX = int(sys.argv[1])
@@ -25,3 +27,5 @@ if DO_BACKUP:
     dir = f"../backup/{(LOOP_INDEX-1):03}_after_fit"
     os.makedirs(dir)
     shutil.copy("model\\latest.h5", os.path.join(dir, "latest.h5"))
+
+calc_hash.calculate_file_hash(get_path("model/latest.h5"))
