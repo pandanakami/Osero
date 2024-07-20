@@ -9,52 +9,53 @@ import extend_history
 import sys
 import pickle
 
+# 設定
+#############################################################
+# 実行処理設定
+DO_DOWNLOAD = True
+DO_MERGE = True
+DO_EXTEND = True
+DO_UPLOAD = True
+
+# ダウンロード一覧(DO_DOWNLOAD=Falseの場合は無効)
+HAS_LOCAL = True
+HAS_COLAB = True
+HAS_RASPI = True
+HAS_SAGE_MAKER = True
+
+# 共通処理
+#############################################################
 try:
     No = int(sys.argv[1])
 except ValueError:
     print("Please provide a valid integer.")
     sys.exit(1)
 
-do_download = True
-do_merge = True
-do_extend = True
-do_upload = True
-
-
-has_raspi = True
-
-
 dir = f"../backup/{No:03}_pre_fit"
 output_dir = os.path.join(dir, "extend")
 
-if (not do_merge) and do_extend:
+inputs = []
+
+if (not DO_MERGE) and DO_EXTEND:
     print("対象外の設定, merge, extend")
     sys.exit(1)
 
-if do_download or do_upload:
+if DO_DOWNLOAD or DO_UPLOAD:
     # GDriveからダウンロード
     gdrive = GoogleDriveMng()
 
+#############################################################3
 
-if do_download:
+## ダウンロード
+if DO_DOWNLOAD:
 
     def print_info(path):
         progress = Progress.load(os.path.join(path, "progress/progress.pkl"))
         with open(os.path.join(path, "game_history_tmp.pkl"), "rb") as f:
             history = pickle.load(f)
-        print(f"{path}, count:{progress.play_count}, history_num:{len(history)}")
-
-    # バックアップ生成
-    if os.path.exists(dir):
-        raise FileExistsError("既にあるよ。")
-    os.makedirs(dir, exist_ok=False)
-
-    # ローカル
-    dir2 = os.path.join(dir, "local")
-    os.makedirs(dir2, exist_ok=False)
-    shutil.copy("game_history_tmp.pkl", os.path.join(dir2, "game_history_tmp.pkl"))
-    shutil.copytree("progress", os.path.join(dir2, "progress"))
-    print_info(dir2)
+        print(
+            f"{path}, loop_index:{progress.loop_index}, count:{progress.play_count}, history_num:{len(history)}"
+        )
 
     def download(remote_base, local_base):
         local_base = str.replace(local_base, "/", "\\")
@@ -70,23 +71,52 @@ if do_download:
             os.path.join(remote_base, "progress/progress.pkl"),
             os.path.join(dir3, "progress.pkl"),
         )
+        inputs.append(local_base)
+        print_info(dir2)
+
+    # バックアップ生成
+    if os.path.exists(dir):
+        raise FileExistsError("既にあるよ。")
+    os.makedirs(dir, exist_ok=False)
+
+    # ローカル
+    if HAS_LOCAL:
+        dir2 = os.path.join(dir, "local")
+        os.makedirs(dir2, exist_ok=False)
+        shutil.copy("game_history_tmp.pkl", os.path.join(dir2, "game_history_tmp.pkl"))
+        shutil.copytree("progress", os.path.join(dir2, "progress"))
+        inputs.append("local")
         print_info(dir2)
 
     # google colab
-    download("osero_rl", "colab")
+    if HAS_COLAB:
+        download("osero_rl", "colab")
 
     # sage maker
-    for i in range(4):
-        download(f"osero_rl/sage_maker/{i}", f"sage_maker/{i}")
+    if HAS_SAGE_MAKER:
+        for i in range(4):
+            download(f"osero_rl/sage_maker/{i}", f"sage_maker/{i}")
 
-    if has_raspi:
+    if HAS_RASPI:
         # raspberry pi
         for i in range(4):
             download(f"osero_rl/raspi/{i}", f"raspi/{i}")
+else:
+    dirs = os.listdir(dir)
+    dirs = [d for d in dirs if d != "extend"]
+
+    for d in dirs:
+        if d == "extend":
+            continue
+        elif d == "raspi" or d == "sage_maker":
+            for i in range(4):
+                inputs.append(os.path.join(d, f"{i}"))
+        else:
+            inputs.append(d)
 
 
 ## マージ
-if do_merge:
+if DO_MERGE:
 
     def merge(input1, input2, output):
         input1 = os.path.join(dir, input1)
@@ -95,30 +125,36 @@ if do_merge:
         os.makedirs(output)
         merge_history.merge(input1, input2, output)
 
-    if has_raspi:
-        merge("local", "colab", "tmp0")
-        merge("sage_maker/0", "sage_maker/1", "tmp1")
-        merge("sage_maker/2", "sage_maker/3", "tmp2")
-        merge("raspi/0", "raspi/1", "tmp3")
-        merge("raspi/2", "raspi/3", "tmp4")
-        merge("tmp0", "tmp1", "tmp10")
-        merge("tmp2", "tmp3", "tmp11")
-        merge("tmp10", "tmp11", "tmp20")
-        merge("tmp20", "tmp4", "combine")
-    else:
-        merge("local", "colab", "tmp0")
-        merge("sage_maker/0", "sage_maker/1", "tmp1")
-        merge("sage_maker/2", "sage_maker/3", "tmp2")
-        merge("tmp0", "tmp1", "tmp10")
-        merge("tmp10", "tmp2", "combine")
+    in_list = inputs
+
+    all_tmp_list = []
+    out_list = [in_list[0]]
+
+    while len(in_list) > 1:
+        out_list = []
+        # 奇数(3以上)
+        if len(in_list) % 2 != 0:
+            out_list.append(in_list.pop())
+        for i in range(0, len(in_list), 2):
+            if len(in_list) == 2 and len(out_list) == 0:
+                out_dir = "combine"
+                pass
+            else:
+                out_dir = f"tmp{len(all_tmp_list)}"
+
+            all_tmp_list.append(out_dir)
+            out_list.append(out_dir)
+            merge(in_list[i], in_list[i + 1], out_dir)
+
+        in_list = out_list
 
     def rm(path):
         path = os.path.join(dir, path)
         shutil.rmtree(path)
 
     ## 拡張
-    input_dir = os.path.join(dir, "combine")
-    if do_extend:
+    input_dir = os.path.join(dir, out_list[0])
+    if DO_EXTEND:
         extend_history.extend(input_dir, output_dir)
     else:
         if os.path.exists(output_dir):
@@ -126,19 +162,11 @@ if do_merge:
         shutil.copytree(input_dir, output_dir)
 
     # テンポラリ削除
-    rm("tmp0")
-    rm("tmp1")
-    rm("tmp2")
-    rm("tmp10")
-    rm("combine")
+    for path in all_tmp_list:
+        rm(path)
 
-    if has_raspi:
-        rm("tmp3")
-        rm("tmp4")
-        rm("tmp11")
-        rm("tmp20")
-
-if do_upload:
+## アップロード
+if DO_UPLOAD:
     # アップロード
     gdrive.upload_file(
         os.path.join(output_dir, "game_history_tmp.pkl"),
