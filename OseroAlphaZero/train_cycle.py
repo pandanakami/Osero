@@ -35,6 +35,10 @@ def main():
                 progress.set_state(ProgressState.END_SELF_PLAY)
 
             if progress.get_state() == ProgressState.END_SELF_PLAY:
+
+                if "END_WITH_TRAIN" in os.environ:
+                    print("END_WITH_TRAIN mode")
+
                 # パラメータ更新部
                 train_network(i)
                 progress.set_state(ProgressState.END_TRAIN)
