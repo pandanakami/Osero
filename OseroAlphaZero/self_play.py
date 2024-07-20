@@ -17,6 +17,7 @@ import sys
 from path_mng import get_path, tqdm
 from progress import Progress
 import gc
+import myutil
 
 # パラメータの準備
 SP_GAME_COUNT = 600  # セルフプレイを行うゲーム数（本家は25000）
@@ -102,6 +103,7 @@ def self_play(progress: Progress):
 
     model = load_model(path)
     path = ""
+    core = myutil.get_core()
 
     # 複数回のゲームの実行
     try:
@@ -112,11 +114,14 @@ def self_play(progress: Progress):
         initial_count = progress.play_count
         print(f"play start at :{initial_count}, history num:{len(history)}")
 
+        if initial_count < SP_GAME_COUNT:
+            myutil.discord_write(f"start battle({core})::at {initial_count}")
+
         with tqdm(
             total=SP_GAME_COUNT, initial=initial_count, desc="PlayCount", leave=True
         ) as pbar:
             with tqdm(desc="History num", unit=" iteration", leave=False) as his_pbar:
-                for _ in range(initial_count, SP_GAME_COUNT):
+                for count in range(initial_count, SP_GAME_COUNT):
                     # 1ゲームの実行
                     h = play(model)
                     history.extend(h)
@@ -132,6 +137,9 @@ def self_play(progress: Progress):
 
                     del h
                     gc.collect()
+
+                    if count % 50 == 0 and count > 0:
+                        myutil.discord_write(f"update battle({core})::{count}")
 
     except KeyboardInterrupt as e:
 

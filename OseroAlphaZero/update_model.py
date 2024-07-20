@@ -12,7 +12,12 @@ except ValueError:
     print("Please provide a valid integer.")
     sys.exit(1)
 
-DO_BACKUP = False
+
+def is_windows():
+    return os.name == "nt"
+
+
+DO_BACKUP = is_windows()
 
 # 履歴リセット
 reset_progress.reset_progress(LOOP_INDEX)

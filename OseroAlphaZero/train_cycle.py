@@ -13,14 +13,11 @@ if __name__ == "__main__":
     from path_mng import tqdm
     import tensorflow as tf
     import os
-
-
-def is_windows():
-    return os.name == "nt"
+    import myutil
 
 
 def main():
-    if is_windows():
+    if myutil.is_windows():
         print("Running on CPU 0")
     else:
         print(f"Running on CPU: {os.sched_getaffinity(0)}")
@@ -41,6 +38,10 @@ def main():
                 # パラメータ更新部
                 train_network(i)
                 progress.set_state(ProgressState.END_TRAIN)
+
+                myutil.discord_write("osero rl::train finish!")
+                if "END_WITH_TRAIN" in os.environ:
+                    break
 
             is_update = False
             if progress.get_state() == ProgressState.END_TRAIN:
