@@ -26,7 +26,7 @@ def main():
     progress = Progress.load()
 
     try:
-        for i in range(progress.loop_index, 10):
+        for i in range(progress.loop_index, 100):
             print(f"Train:{i} state:{progress.get_state()} ====================")
 
             if progress.get_state() == ProgressState.START:
