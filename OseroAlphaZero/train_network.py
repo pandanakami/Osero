@@ -109,10 +109,6 @@ def _load_model_if_resume(model: Model, cycle: int) -> int:
 # デュアルネットワークの学習
 def train_network(cycle: int):
     CORE_NUM = os.cpu_count()
-    # オペレーション内の並列実行
-    tf.config.threading.set_intra_op_parallelism_threads(CORE_NUM)
-    # オペレーション間の並列実行
-    tf.config.threading.set_inter_op_parallelism_threads(CORE_NUM)
 
     # 学習データの読み込み
     history = load_data()

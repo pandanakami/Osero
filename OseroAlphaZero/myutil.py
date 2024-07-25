@@ -21,3 +21,9 @@ def get_core():
     else:
         core = f"{os.sched_getaffinity(0)}"
     return core
+
+
+# google colab起動か否か
+def is_colab():
+    # cpu起動でもCOLAB_GPUのキーはある
+    return "COLAB_GPU" in os.environ

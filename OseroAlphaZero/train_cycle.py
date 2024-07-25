@@ -17,6 +17,15 @@ if __name__ == "__main__":
 
 
 def main():
+
+    if myutil.is_colab():
+        CORE_NUM = os.cpu_count()
+
+        # オペレーション内の並列実行
+        tf.config.threading.set_intra_op_parallelism_threads(CORE_NUM)
+        # オペレーション間の並列実行
+        tf.config.threading.set_inter_op_parallelism_threads(CORE_NUM)
+
     if myutil.is_windows():
         print("Running on CPU 0")
     else:
