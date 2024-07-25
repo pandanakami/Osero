@@ -19,7 +19,7 @@ import numpy as np
 import pickle
 from path_mng import get_path
 from sklearn.model_selection import train_test_split
-
+import tensorflow as tf
 import os
 
 
@@ -108,6 +108,12 @@ def _load_model_if_resume(model: Model, cycle: int) -> int:
 
 # デュアルネットワークの学習
 def train_network(cycle: int):
+    CORE_NUM = os.cpu_count()
+    # オペレーション内の並列実行
+    tf.config.threading.set_intra_op_parallelism_threads(CORE_NUM)
+    # オペレーション間の並列実行
+    tf.config.threading.set_inter_op_parallelism_threads(CORE_NUM)
+
     # 学習データの読み込み
     history = load_data()
     xs, y_policies, y_values = zip(*history)
@@ -145,6 +151,8 @@ def train_network(cycle: int):
         callbacks=[callbacks(cycle)],
         initial_epoch=initial_epoch,
         validation_data=(x_val, [y1_val, y2_val]),
+        use_multiprocessing=True,  # マルチプロセッシングを有効化
+        workers=CORE_NUM,  # ワーカープロセスの数を設定
     )
     print("")
 
