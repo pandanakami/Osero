@@ -13,7 +13,7 @@ import sys
 from path_mng import get_path, tqdm
 
 # パラメータの準備
-PV_EVALUATE_COUNT = 100  # 1推論あたりのシミュレーション回数（本家は1600）
+PV_EVALUATE_COUNT = 200  # 1推論あたりのシミュレーション回数（本家は1600）
 
 
 # 推論
